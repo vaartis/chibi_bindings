@@ -1,0 +1,4 @@
+deps/
+compile_commands.json
+_build/
+.cquery_cached_index/
