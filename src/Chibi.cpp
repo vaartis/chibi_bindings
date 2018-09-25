@@ -35,6 +35,10 @@ sexp Chibi::eval_string(std::string str) {
     return sexp_eval_string(context, str.c_str(), -1, nullptr);
 }
 
+sexp Chibi::make_string(std::string str) {
+    return sexp_c_string(context, str.c_str(), -1);
+}
+
 Chibi::~Chibi() {
     sexp_destroy_context(context);
 }

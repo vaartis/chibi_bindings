@@ -32,6 +32,8 @@ public:
     template<typename Elem>
     sexp make_list(Elem elem);
 
+    /** Creates a scheme string from a C++ string. Unlike sexp_make_string, this function fills the string with actual content. */
+    sexp make_string(std::string str);
 
 
     // Debug/Printing

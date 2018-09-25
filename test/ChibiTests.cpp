@@ -58,3 +58,10 @@ TEST(ChibiTests, MakeList) {
         sexp_unbox_boolean(sexp_equalp(chibi.context, res, lst_wrong))
     );
 }
+
+TEST(ChibiTests, MakeString) {
+    Chibi chibi;
+
+    sexp res = chibi.make_string("test");
+    EXPECT_EQ(std::string(sexp_string_data(res)), "test");
+}
