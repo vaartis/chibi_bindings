@@ -28,6 +28,7 @@ target_link_libraries(chibi_bindings "chibi-scheme")
 include_directories("${CMAKE_SOURCE_DIR}/deps/chibi/include")
 add_dependencies(chibi_bindings chibi_scheme)
 
+include(CTest)
 include(GoogleTest)
 find_package(GTest)
 add_executable(chibi_bindings_tests test/ChibiTests.cpp)
