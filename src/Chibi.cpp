@@ -7,6 +7,7 @@
 
 Chibi::Chibi() {
     context = sexp_make_eval_context(nullptr, nullptr, nullptr, 0, 0);
+    env = sexp_context_env(context);
     sexp_load_standard_ports(context, NULL, stdin, stdout, stderr, 1);
 
     // FIXME: add an actual path configuration or something

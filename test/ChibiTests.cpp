@@ -3,7 +3,6 @@
 #include <Chibi.hpp>
 
 #include <iostream>
-#include <functional>
 
 TEST(ChibiTests, PrintException) {
     Chibi chibi;
@@ -14,7 +13,7 @@ TEST(ChibiTests, PrintException) {
     EXPECT_TRUE(sexp_exceptionp(exp));
     chibi.print_exception(exp, outputPort);
 
-    ASSERT_EQ(std::string(sexp_string_data(sexp_get_output_string(chibi.context, outputPort))), "ERROR: an error\n");
+    EXPECT_EQ(std::string(sexp_string_data(sexp_get_output_string(chibi.context, outputPort))), "ERROR: an error\n");
 }
 
 TEST(ChibiTests, SexpToString) {
@@ -37,19 +36,9 @@ TEST(ChibiTests, EvalString) {
 TEST(ChibiTests, CallCFunction) {
     Chibi chibi;
 
-    auto print = [](sexp ctx, sexp self, long n) -> sexp {
-                     /*
-                           if (sexp_stringp(str)) {
-                               std::cout << sexp_string_data(str) << std::endl;
-                           }
-                     */
+    auto f = +[](sexp ctx, sexp self, long n, sexp arg) { return arg; };
+    chibi.register_function("f", f);
+    sexp res = chibi.eval_string("(f 10)");
 
-                     sexp str = sexp_write_to_string(ctx, self);
-                     std::cout << sexp_string_data(str) << std::endl;
-                           return SEXP_VOID;
-                       };
-
-    sexp_define_foreign(chibi.context, sexp_context_env(chibi.context), "pprint", 1, print);
-    chibi.eval_string("(pprint \"abcd\")");
-
+    EXPECT_EQ(sexp_unbox_fixnum(res), 10);
 }
