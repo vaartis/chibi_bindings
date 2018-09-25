@@ -3,6 +3,7 @@
 #include <Chibi.hpp>
 
 #include <iostream>
+#include <functional>
 
 TEST(ChibiTests, PrintException) {
     Chibi chibi;
@@ -31,4 +32,24 @@ TEST(ChibiTests, EvalString) {
 
     EXPECT_TRUE(sexp_fixnump(one_sexp));
     EXPECT_EQ(one_sexp, SEXP_ONE);
+}
+
+TEST(ChibiTests, CallCFunction) {
+    Chibi chibi;
+
+    auto print = [](sexp ctx, sexp self, long n) -> sexp {
+                     /*
+                           if (sexp_stringp(str)) {
+                               std::cout << sexp_string_data(str) << std::endl;
+                           }
+                     */
+
+                     sexp str = sexp_write_to_string(ctx, self);
+                     std::cout << sexp_string_data(str) << std::endl;
+                           return SEXP_VOID;
+                       };
+
+    sexp_define_foreign(chibi.context, sexp_context_env(chibi.context), "pprint", 1, print);
+    chibi.eval_string("(pprint \"abcd\")");
+
 }
