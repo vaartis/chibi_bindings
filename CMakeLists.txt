@@ -16,6 +16,7 @@ ExternalProject_Add(chibi_scheme
 
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/deps/download/chibi"
 
+  UPDATE_COMMAND ""
   CONFIGURE_COMMAND ""
   BUILD_COMMAND make
   INSTALL_COMMAND CHIBI_MODULE_PATH=${CMAKE_SOURCE_DIR}/deps/download/chibi/lib PREFIX=${CMAKE_SOURCE_DIR}/deps/chibi make install
