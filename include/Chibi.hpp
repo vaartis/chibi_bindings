@@ -8,12 +8,6 @@ class Chibi {
 public:
     Chibi();
 
-    /** Prints a chibi exception to the specified port.
-     *
-     * @throws std::invalid_argument if `exception` is not an exception
-     */
-    void print_exception(sexp exception, std::optional<sexp> port = std::nullopt);
-
     /** Converts a chibi expression to it's string representation. */
     std::string sexp_to_string(sexp exp);
 
@@ -28,11 +22,30 @@ public:
     template<typename... Args>
     void register_function(std::string name, sexp (*fnc)(sexp, sexp, long, Args...));
 
+
+    // Functions to create scheme values
+
+
     /** Create a list from expressions provided, making it a proper linked list with a nil at the end */
     template<typename Elem, typename... Elems>
     sexp make_list(Elem elem, Elems... elems);
     template<typename Elem>
     sexp make_list(Elem elem);
+
+
+
+    // Debug/Printing
+
+
+    /** Prints a chibi exception to the specified port.
+     *
+     * @throws std::invalid_argument if `exception` is not an exception
+     */
+    void print_exception(sexp exception, std::optional<sexp> port = std::nullopt);
+
+
+    // Members
+
 
     /** Current context used in this instance. */
     sexp context;
