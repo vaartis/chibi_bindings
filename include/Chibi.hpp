@@ -1,3 +1,5 @@
+#pragma once
+
 #include <optional>
 
 #include <chibi/eval.h>
@@ -26,6 +28,12 @@ public:
     template<typename... Args>
     void register_function(std::string name, sexp (*fnc)(sexp, sexp, long, Args...));
 
+    /** Create a list from expressions provided, making it a proper linked list with a nil at the end */
+    template<typename Elem, typename... Elems>
+    sexp make_list(Elem elem, Elems... elems);
+    template<typename Elem>
+    sexp make_list(Elem elem);
+
     /** Current context used in this instance. */
     sexp context;
 
@@ -38,4 +46,14 @@ public:
 template<typename... Args>
 void Chibi::register_function(std::string name, sexp (*fnc)(sexp, sexp, long, Args...)) {
     sexp_define_foreign(context, env, name.c_str(), sizeof...(Args), fnc);
+}
+
+template<typename Elem>
+sexp Chibi::make_list(Elem elem) {
+    return sexp_list1(context, elem);
+}
+
+template<typename Elem, typename... Elems>
+sexp Chibi::make_list(Elem elem, Elems... elems) {
+    return sexp_cons(context, elem, make_list(elems...));
 }

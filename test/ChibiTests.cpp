@@ -42,3 +42,19 @@ TEST(ChibiTests, CallCFunction) {
 
     EXPECT_EQ(sexp_unbox_fixnum(res), 10);
 }
+
+TEST(ChibiTests, MakeList) {
+    Chibi chibi;
+
+    sexp res = chibi.make_list(SEXP_ONE, SEXP_TWO, SEXP_THREE);
+
+    sexp lst = chibi.eval_string("'(1 2 3)");
+    sexp lst_wrong = chibi.eval_string("'(1 2 3 4)");
+
+    EXPECT_TRUE(
+        sexp_unbox_boolean(sexp_equalp(chibi.context, res, lst))
+    );
+    EXPECT_FALSE(
+        sexp_unbox_boolean(sexp_equalp(chibi.context, res, lst_wrong))
+    );
+}
