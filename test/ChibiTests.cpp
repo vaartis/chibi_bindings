@@ -65,3 +65,10 @@ TEST(ChibiTests, MakeString) {
     sexp res = chibi.make_string("test");
     EXPECT_EQ(std::string(sexp_string_data(res)), "test");
 }
+
+TEST(ChibiTests, MakeInteger) {
+    Chibi chibi;
+
+    sexp res = chibi.make_integer(128);
+    EXPECT_EQ(sexp_unbox_fixnum(res), 128);
+}

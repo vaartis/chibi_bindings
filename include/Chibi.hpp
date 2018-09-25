@@ -35,6 +35,9 @@ public:
     /** Creates a scheme string from a C++ string. Unlike sexp_make_string, this function fills the string with actual content. */
     sexp make_string(std::string str);
 
+    /** Create an scheme integer, heap allocating as a bignum if needed. */
+    sexp make_integer(sexp_sint_t num);
+
 
     // Debug/Printing
 

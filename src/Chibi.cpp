@@ -39,6 +39,10 @@ sexp Chibi::make_string(std::string str) {
     return sexp_c_string(context, str.c_str(), -1);
 }
 
+sexp Chibi::make_integer(sexp_sint_t num) {
+    return sexp_make_integer(context, num);
+}
+
 Chibi::~Chibi() {
     sexp_destroy_context(context);
 }
