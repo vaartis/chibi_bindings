@@ -19,14 +19,13 @@ std::string Chibi::sexp_to_string(sexp exp) {
     return std::string(sexp_string_data(sexp_str));
 }
 
-void Chibi::print_exception(sexp exception, std::optional<sexp> port) {
-    if (!sexp_exceptionp(exception)) {
-        throw std::invalid_argument(
-            "Expected an exception to print, but the expression was " + sexp_to_string(exception)
-        );
+void Chibi::debug_print(sexp expr, std::optional<sexp> port) {
+    auto prt = port.value_or(sexp_current_error_port(context));
+    if (sexp_exceptionp(expr)) {
+        sexp_print_exception(context, expr, prt);
+    } else {
+        sexp_write(context, expr, prt);
     }
-
-    sexp_print_exception(context, exception, port.value_or(sexp_current_error_port(context)));
 }
 
 sexp Chibi::eval_string(std::string str) {

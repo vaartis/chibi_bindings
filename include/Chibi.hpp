@@ -49,12 +49,11 @@ public:
 
     // Debug/Printing
 
-
-    /** Prints a scheme exception to the specified port.
+    /** Prints a scheme expression to the specified port.
      *
-     * @throws std::invalid_argument if `exception` is not an exception
+     * Additionally, transforms exceptions into their text representation.
      */
-    void print_exception(sexp exception, std::optional<sexp> port = std::nullopt);
+    void debug_print(sexp expr, std::optional<sexp> port = std::nullopt);
 
 
     // Members

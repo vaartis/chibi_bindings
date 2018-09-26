@@ -4,16 +4,21 @@
 
 #include <iostream>
 
-TEST(ChibiTests, PrintException) {
+TEST(ChibiTests, DebugPrint) {
     Chibi chibi;
 
     sexp outputPort = sexp_open_output_string(chibi.context);
 
     sexp exp = chibi.eval_string("(error \"an error\")");
     EXPECT_TRUE(sexp_exceptionp(exp));
-    chibi.print_exception(exp, outputPort);
+    chibi.debug_print(exp, outputPort);
 
     EXPECT_EQ(std::string(sexp_string_data(sexp_get_output_string(chibi.context, outputPort))), "ERROR: an error\n");
+
+    sexp outputPort2 = sexp_open_output_string(chibi.context);
+    sexp exp2 = chibi.eval_string("1");
+    chibi.debug_print(exp2, outputPort2);
+    EXPECT_EQ(std::string(sexp_string_data(sexp_get_output_string(chibi.context, outputPort2))), "1");
 }
 
 TEST(ChibiTests, SexpToString) {
