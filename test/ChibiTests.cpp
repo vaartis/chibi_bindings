@@ -72,3 +72,24 @@ TEST(ChibiTests, MakeInteger) {
     sexp res = chibi.make_integer(128);
     EXPECT_EQ(sexp_unbox_fixnum(res), 128);
 }
+
+TEST(ChibiTests, Struct) {
+    /*
+    Chibi chibi;
+
+    auto rs = chibi.eval_strings(
+        "(import (srfi 99))",
+        "(begin"
+        " (define-record-type thing (make-thing a b) thing? (a thing-a) (b thing-b))"
+        " (make-thing 1 2)"
+        ")"
+    );
+
+    try {
+        chibi.print_exception(rs[0]);
+        chibi.print_exception(rs[1]);
+    } catch (...) {}
+
+    std::cout << chibi.sexp_to_string(rs[1]) << std::endl;
+    */
+}

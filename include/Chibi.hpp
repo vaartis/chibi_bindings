@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
 #include <chibi/eval.h>
 
@@ -8,11 +9,15 @@ class Chibi {
 public:
     Chibi();
 
-    /** Converts a chibi expression to it's string representation. */
+    /** Converts a scheme expression to it's string representation. */
     std::string sexp_to_string(sexp exp);
 
-    /** Evaluates a string as a chibi expression and returns the result */
+    /** Evaluates a string as a scheme expression and returns the result. */
     sexp eval_string(std::string str);
+
+    template<typename... Args>
+    /** Evaluates several strings in order and returns the results. */
+    std::vector<sexp> eval_strings(Args... strs);
 
     /** Registers a function pointer or a lambda to be callable from scheme.
 
@@ -42,7 +47,7 @@ public:
     // Debug/Printing
 
 
-    /** Prints a chibi exception to the specified port.
+    /** Prints a scheme exception to the specified port.
      *
      * @throws std::invalid_argument if `exception` is not an exception
      */
@@ -74,4 +79,16 @@ sexp Chibi::make_list(Elem elem) {
 template<typename Elem, typename... Elems>
 sexp Chibi::make_list(Elem elem, Elems... elems) {
     return sexp_cons(context, elem, make_list(elems...));
+}
+
+template<typename... Args>
+/** Evaluates several strings in order and returns the results. */
+std::vector<sexp> Chibi::eval_strings(Args... strs) {
+    std::vector<sexp> res;
+
+    for (auto str : { strs... }) {
+        res.push_back(eval_string(str));
+    }
+
+    return res;
 }

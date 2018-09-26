@@ -1,6 +1,3 @@
-#include <iostream>
-#include <cassert>
-
 #include <chibi/eval.h>
 
 #include "Chibi.hpp"
