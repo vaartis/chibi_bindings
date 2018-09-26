@@ -5,12 +5,13 @@
 Chibi::Chibi() {
     context = sexp_make_eval_context(nullptr, nullptr, nullptr, 0, 0);
     env = sexp_context_env(context);
-    sexp_load_standard_ports(context, NULL, stdin, stdout, stderr, 1);
 
     // FIXME: add an actual path configuration or something
-    sexp_add_module_directory(context, sexp_c_string(context, "../deps/chibi/share/chibi/", -1), SEXP_TRUE);
+    sexp_add_module_directory(context, make_string("../deps/chibi/share/chibi/"), SEXP_TRUE);
+    sexp_add_module_directory(context, make_string("../deps/chibi/lib/chibi/"), SEXP_TRUE);
 
-    sexp std_loading_res = sexp_load_standard_env(context, sexp_context_env(context), SEXP_SEVEN);
+    sexp_load_standard_env(context, nullptr, SEXP_SEVEN);
+    sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
 }
 
 std::string Chibi::sexp_to_string(sexp exp) {
