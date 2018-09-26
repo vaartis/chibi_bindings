@@ -16,7 +16,10 @@ public:
     sexp eval_string(std::string str);
 
     template<typename... Args>
-    /** Evaluates several strings in order and returns the results. */
+    /** Evaluates several strings in order and returns the results.
+
+        This might be useful when one needs to first import something, as imports take effect starting from the next expression.
+    */
     std::vector<sexp> eval_strings(Args... strs);
 
     /** Registers a function pointer or a lambda to be callable from scheme.
