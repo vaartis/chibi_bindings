@@ -14,11 +14,11 @@ Chibi::Chibi() {
     sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
 }
 
-SExp Chibi::eval_string(std::string str) {
+SExp Chibi::eval_string(const std::string &str) {
     return make_SExp(sexp_eval_string(context, str.c_str(), -1, nullptr));
 }
 
-SExp Chibi::make_string(std::string str) {
+SExp Chibi::make_string(const std::string &str) {
     return make_SExp(sexp_c_string(context, str.c_str(), -1));
 }
 
@@ -26,7 +26,7 @@ SExp Chibi::make_integer(sexp_sint_t num) {
     return make_SExp(sexp_make_integer(context, num));
 }
 
-SExp Chibi::make_SExp(sexp exp) {
+SExp Chibi::make_SExp(const sexp &exp) {
     return SExp(context, exp);
 }
 
