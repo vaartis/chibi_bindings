@@ -7,17 +7,17 @@
 /** A uility class on top of sexp. */
 class SExp {
 public:
-    SExp(sexp context, sexp the_expression);
+    SExp(const sexp &context, const sexp &the_expression);
 
     operator sexp() const { return underlying; }
 
-    bool operator ==(sexp other) const;
+    bool operator==(const sexp &other) const;
 
     /** Convert the expression to a value specified by a sexp_types tag.
      *
      * If the value is not of this type, nullopt will be returned.
      */
-    template<typename Output>
+    template <typename Output>
     std::optional<Output> to() const;
 
     /** Dump the text representation of the expression to a specified port (current output port, by default).
@@ -26,9 +26,9 @@ public:
      */
     void dump(std::optional<sexp> port = std::nullopt);
 
-    sexp context;
-
     ~SExp();
+
 private:
+    sexp context;
     sexp underlying;
 };

@@ -1,6 +1,8 @@
 #include "SExp.hpp"
 
-SExp::SExp(sexp context, sexp the_expression) : context(context), underlying(the_expression) {
+SExp::SExp(const sexp &context, const sexp &the_expression)
+    : context(context)
+    , underlying(the_expression) {
     sexp_preserve_object(context, underlying);
 }
 
@@ -13,7 +15,7 @@ void SExp::dump(std::optional<sexp> port) {
     }
 }
 
-bool SExp::operator ==(sexp other) const {
+bool SExp::operator==(const sexp &other) const {
     return sexp_unbox_boolean(
         sexp_equalp(context, underlying, other)
     );
@@ -39,7 +41,6 @@ std::optional<bool> SExp::to() const {
         ? std::make_optional(static_cast<bool>(sexp_unbox_boolean(underlying)))
         : std::nullopt;;
 }
-
 
 SExp::~SExp() {
     sexp_release_object(context, underlying);
