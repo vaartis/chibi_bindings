@@ -21,21 +21,21 @@ bool SExp::operator==(const sexp &other) const {
     );
 }
 
-template<>
+template <>
 std::optional<sexp_sint_t> SExp::to() const {
     return sexp_fixnump(underlying)
         ? std::make_optional(sexp_unbox_fixnum(underlying))
         : std::nullopt;
 }
 
-template<>
+template <>
 std::optional<std::string> SExp::to() const {
     return sexp_stringp(underlying)
         ? std::make_optional(std::string(sexp_string_data(underlying)))
         : std::nullopt;;
 }
 
-template<>
+template <>
 std::optional<bool> SExp::to() const {
     return sexp_booleanp(underlying)
         ? std::make_optional(static_cast<bool>(sexp_unbox_boolean(underlying)))
