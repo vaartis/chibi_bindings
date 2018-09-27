@@ -7,7 +7,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
 
 project(chibi_bindings)
-add_library(chibi_bindings src/Chibi.cpp)
+add_library(chibi_bindings
+  include/SExp.hpp
+  include/Chibi.hpp
+
+  src/SExp.cpp
+  src/Chibi.cpp
+  src/Record.cpp
+)
 include_directories(include)
 
 ExternalProject_Add(chibi_scheme
@@ -32,6 +39,9 @@ add_dependencies(chibi_bindings chibi_scheme)
 include(CTest)
 include(GoogleTest)
 find_package(GTest)
-add_executable(chibi_bindings_tests test/ChibiTests.cpp)
+add_executable(chibi_bindings_tests
+  test/ChibiTests.cpp
+  test/SExpTests.cpp
+)
 target_link_libraries(chibi_bindings_tests ${GTEST_BOTH_LIBRARIES} chibi_bindings)
 gtest_discover_tests(chibi_bindings_tests)

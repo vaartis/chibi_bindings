@@ -5,22 +5,21 @@
 
 #include <chibi/eval.h>
 
+#include "SExp.hpp"
+
 class Chibi {
 public:
     Chibi();
 
-    /** Converts a scheme expression to it's string representation. */
-    std::string sexp_to_string(sexp exp);
-
     /** Evaluates a string as a scheme expression and returns the result. */
-    sexp eval_string(std::string str);
+    SExp eval_string(std::string str);
 
     template<typename... Args>
     /** Evaluates several strings in order and returns the results.
 
         This might be useful when one needs to first import something, as imports take effect starting from the next expression.
     */
-    std::vector<sexp> eval_strings(Args... strs);
+    std::vector<SExp> eval_strings(Args... strs);
 
     /** Registers a function pointer or a lambda to be callable from scheme.
 
@@ -36,24 +35,18 @@ public:
 
     /** Create a list from expressions provided, making it a proper linked list with a nil at the end */
     template<typename Elem, typename... Elems>
-    sexp make_list(Elem elem, Elems... elems);
+    SExp make_list(Elem elem, Elems... elems);
     template<typename Elem>
-    sexp make_list(Elem elem);
+    SExp make_list(Elem elem);
 
     /** Creates a scheme string from a C++ string. Unlike sexp_make_string, this function fills the string with actual content. */
-    sexp make_string(std::string str);
+    SExp make_string(std::string str);
 
     /** Create an scheme integer, heap allocating as a bignum if needed. */
-    sexp make_integer(sexp_sint_t num);
+    SExp make_integer(sexp_sint_t num);
 
-
-    // Debug/Printing
-
-    /** Prints a scheme expression to the specified port.
-     *
-     * Additionally, transforms exceptions into their text representation.
-     */
-    void debug_print(sexp expr, std::optional<sexp> port = std::nullopt);
+    /** Wraps a sexp into a SExp class */
+    SExp make_SExp(sexp exp);
 
 
     // Members
@@ -74,19 +67,18 @@ void Chibi::register_function(std::string name, sexp (*fnc)(sexp, sexp, long, Ar
 }
 
 template<typename Elem>
-sexp Chibi::make_list(Elem elem) {
-    return sexp_list1(context, elem);
+SExp Chibi::make_list(Elem elem) {
+    return make_SExp(sexp_list1(context, elem));
 }
 
 template<typename Elem, typename... Elems>
-sexp Chibi::make_list(Elem elem, Elems... elems) {
-    return sexp_cons(context, elem, make_list(elems...));
+SExp Chibi::make_list(Elem elem, Elems... elems) {
+    return make_SExp(sexp_cons(context, elem, make_list(elems...)));
 }
 
 template<typename... Args>
-/** Evaluates several strings in order and returns the results. */
-std::vector<sexp> Chibi::eval_strings(Args... strs) {
-    std::vector<sexp> res;
+std::vector<SExp> Chibi::eval_strings(Args... strs) {
+    std::vector<SExp> res;
 
     for (auto str : { strs... }) {
         res.push_back(eval_string(str));

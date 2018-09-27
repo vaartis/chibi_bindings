@@ -14,30 +14,20 @@ Chibi::Chibi() {
     sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
 }
 
-std::string Chibi::sexp_to_string(sexp exp) {
-    sexp sexp_str = sexp_write_to_string(context, exp);
-    return std::string(sexp_string_data(sexp_str));
+SExp Chibi::eval_string(std::string str) {
+    return make_SExp(sexp_eval_string(context, str.c_str(), -1, nullptr));
 }
 
-void Chibi::debug_print(sexp expr, std::optional<sexp> port) {
-    auto prt = port.value_or(sexp_current_error_port(context));
-    if (sexp_exceptionp(expr)) {
-        sexp_print_exception(context, expr, prt);
-    } else {
-        sexp_write(context, expr, prt);
-    }
+SExp Chibi::make_string(std::string str) {
+    return make_SExp(sexp_c_string(context, str.c_str(), -1));
 }
 
-sexp Chibi::eval_string(std::string str) {
-    return sexp_eval_string(context, str.c_str(), -1, nullptr);
+SExp Chibi::make_integer(sexp_sint_t num) {
+    return make_SExp(sexp_make_integer(context, num));
 }
 
-sexp Chibi::make_string(std::string str) {
-    return sexp_c_string(context, str.c_str(), -1);
-}
-
-sexp Chibi::make_integer(sexp_sint_t num) {
-    return sexp_make_integer(context, num);
+SExp Chibi::make_SExp(sexp exp) {
+    return SExp(context, exp);
 }
 
 Chibi::~Chibi() {
