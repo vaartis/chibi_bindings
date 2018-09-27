@@ -13,7 +13,6 @@ add_library(chibi_bindings
 
   src/SExp.cpp
   src/Chibi.cpp
-  src/Record.cpp
 )
 include_directories(include)
 
