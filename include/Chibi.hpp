@@ -14,7 +14,7 @@ public:
     /** Evaluates a string as a scheme expression and returns the result. */
     SExp eval_string(const std::string &str);
 
-    template<typename... Args>
+    template <typename... Args>
     /** Evaluates several strings in order and returns the results.
 
         This might be useful when one needs to first import something, as imports take effect starting from the next expression.
@@ -26,15 +26,15 @@ public:
         @arg name name, under which this function will be known in scheme
         @arg fnc the function pointer to use
      */
-    template<typename... Args>
+    template <typename... Args>
     void register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...));
 
     // Functions to create scheme values
     /** Create a list from expressions provided, making it a proper linked list with a nil at the end */
-    template<typename Elem, typename... Elems>
+    template <typename Elem, typename... Elems>
     SExp make_list(Elem elem, Elems... elems);
 
-    template<typename Elem>
+    template <typename Elem>
     SExp make_list(Elem elem);
 
     /** Creates a scheme string from a C++ string. Unlike sexp_make_string, this function fills the string with actual content. */
@@ -56,22 +56,22 @@ private:
     sexp env;
 };
 
-template<typename... Args>
+template <typename... Args>
 void Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...)) {
     sexp_define_foreign(context, env, name.c_str(), sizeof...(Args), fnc);
 }
 
-template<typename Elem>
+template <typename Elem>
 SExp Chibi::make_list(Elem elem) {
     return make_SExp(sexp_list1(context, elem));
 }
 
-template<typename Elem, typename... Elems>
+template <typename Elem, typename... Elems>
 SExp Chibi::make_list(Elem elem, Elems... elems) {
     return make_SExp(sexp_cons(context, elem, make_list(elems...)));
 }
 
-template<typename... Args>
+template <typename... Args>
 std::vector<SExp> Chibi::eval_strings(const Args &...strs) {
     std::vector<SExp> res;
 
