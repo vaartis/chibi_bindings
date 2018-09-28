@@ -18,6 +18,10 @@ SExp Chibi::eval_string(const std::string &str) {
     return make_SExp(sexp_eval_string(context, str.c_str(), -1, nullptr));
 }
 
+SExp Chibi::make_symbol(const std::string &symbol) {
+    return make_SExp(sexp_intern(context, symbol.c_str(), -1));
+}
+
 SExp Chibi::make_string(const std::string &str) {
     return make_SExp(sexp_c_string(context, str.c_str(), -1));
 }

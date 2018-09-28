@@ -29,7 +29,13 @@ public:
     template <typename... Args>
     void register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...));
 
+
     // Functions to create scheme values
+
+
+    /** Make, or "intern", a symbol from a given string.  */
+    SExp make_symbol(const std::string &symbol);
+
     /** Create a list from expressions provided, making it a proper linked list with a nil at the end */
     template <typename Elem, typename... Elems>
     SExp make_list(Elem elem, Elems... elems);
