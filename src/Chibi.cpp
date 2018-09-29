@@ -14,6 +14,10 @@ Chibi::Chibi() {
     sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
 }
 
+SExp Chibi::env_ref(const std::string &name, sexp dflt) {
+    return make_SExp(sexp_env_ref(context, env, make_symbol(name), dflt));
+}
+
 SExp Chibi::eval_string(const std::string &str) {
     return make_SExp(sexp_eval_string(context, str.c_str(), -1, nullptr));
 }

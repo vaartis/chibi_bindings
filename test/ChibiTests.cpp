@@ -48,6 +48,16 @@ TEST(ChibiTests, MakeInteger) {
     EXPECT_EQ(res.to<sexp_sint_t>(), 128);
 }
 
+TEST(ChibiTests, EnvRef) {
+    Chibi chibi;
+
+    SExp doesnt = chibi.env_ref("does-not-exist");
+    EXPECT_EQ(doesnt, SEXP_FALSE);
+
+    SExp exists = chibi.env_ref("assoc");
+    EXPECT_NE(exists, SEXP_FALSE);
+}
+
 TEST(ChibiTests, Struct) {
     /*
     Chibi chibi;

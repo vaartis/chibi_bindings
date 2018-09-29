@@ -33,6 +33,9 @@ public:
     // Functions to create scheme values
 
 
+    /** Look up a value in the environment and return it, otherwise return \p dflt. */
+    SExp env_ref(const std::string &name, sexp dflt = SEXP_FALSE);
+
     /** Make, or "intern", a symbol from a given string.  */
     SExp make_symbol(const std::string &symbol);
 
