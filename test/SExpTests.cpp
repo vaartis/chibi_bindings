@@ -15,7 +15,7 @@ TEST(SExpTests, Dump) {
     SExp outputPort2 = chibi.make_SExp(sexp_open_output_string(chibi.context));
     SExp exp2 = chibi.eval_string("1");
     exp2.dump(outputPort2);
-    EXPECT_EQ(chibi.make_SExp(sexp_get_output_string(chibi.context, outputPort2)).to<std::string>(), "1");
+    EXPECT_EQ(chibi.make_SExp(sexp_get_output_string(chibi.context, outputPort2)).to<std::string>(), "1\n");
 }
 
 TEST(SExpTests, To) {

@@ -12,6 +12,7 @@ void SExp::dump(std::optional<sexp> port) {
         sexp_print_exception(context, underlying, prt);
     } else {
         sexp_write(context, underlying, prt);
+        sexp_newline(context, prt);
     }
 }
 
