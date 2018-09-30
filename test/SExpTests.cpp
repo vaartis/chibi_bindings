@@ -26,10 +26,23 @@ TEST(SExpTests, To) {
     EXPECT_EQ(lst.to<sexp_sint_t>(), 1);
 
     str = "#t";
-    lst = chibi.eval_string(str);
-    EXPECT_EQ(lst.to<bool>(), true);
+    SExp lst2 = chibi.eval_string(str);
+    EXPECT_EQ(lst2.to<bool>(), true);
 
     str = "\"abc\"";
-    lst = chibi.eval_string(str);
-    EXPECT_EQ(lst.to<std::string>(), "abc");
+    SExp lst3 = chibi.eval_string(str);
+    EXPECT_EQ(lst3.to<std::string>(), "abc");
+}
+
+TEST(SExpTests, Apply) {
+    Chibi chibi;
+
+    EXPECT_TRUE(
+        chibi.env_ref("string?").apply(chibi.eval_string("\"a\""))->to<bool>()
+    );
+
+    EXPECT_EQ(
+        chibi.env_ref("not-a-function").apply(),
+        std::nullopt
+   );
 }

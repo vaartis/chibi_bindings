@@ -14,7 +14,7 @@ add_library(chibi_bindings
   src/SExp.cpp
   src/Chibi.cpp
 )
-include_directories(include)
+include_directories(include src)
 
 ExternalProject_Add(chibi_scheme
   GIT_REPOSITORY "https://github.com/ashinn/chibi-scheme"

@@ -5,7 +5,7 @@
 
 #include <chibi/eval.h>
 
-#include "SExp.hpp"
+class SExp;
 
 class Chibi {
 public:
@@ -42,9 +42,7 @@ public:
     /** Create a list from expressions provided, making it a proper linked list with a nil at the end */
     template <typename Elem, typename... Elems>
     SExp make_list(Elem elem, Elems... elems);
-
-    template <typename Elem>
-    SExp make_list(Elem elem);
+    SExp make_list();
 
     /** Creates a scheme string from a C++ string. Unlike sexp_make_string, this function fills the string with actual content. */
     SExp make_string(const std::string &str);
@@ -65,28 +63,4 @@ private:
     sexp env;
 };
 
-template <typename... Args>
-void Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...)) {
-    sexp_define_foreign(context, env, name.c_str(), sizeof...(Args), fnc);
-}
-
-template <typename Elem>
-SExp Chibi::make_list(Elem elem) {
-    return make_SExp(sexp_list1(context, elem));
-}
-
-template <typename Elem, typename... Elems>
-SExp Chibi::make_list(Elem elem, Elems... elems) {
-    return make_SExp(sexp_cons(context, elem, make_list(elems...)));
-}
-
-template <typename... Args>
-std::vector<SExp> Chibi::eval_strings(const Args &...strs) {
-    std::vector<SExp> res;
-
-    for (const auto &str : { strs... }) {
-        res.push_back(eval_string(str));
-    }
-
-    return res;
-}
+#include "Chibi_impl.hpp"

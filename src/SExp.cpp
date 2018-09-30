@@ -1,24 +1,25 @@
 #include "SExp.hpp"
+#include "Chibi.hpp"
 
-SExp::SExp(const sexp &context, const sexp &the_expression)
-    : context(context)
+SExp::SExp(Chibi &chibi, sexp the_expression)
+    : chibi(chibi)
     , underlying(the_expression) {
-    sexp_preserve_object(context, underlying);
+    sexp_preserve_object(chibi.context, underlying);
 }
 
 void SExp::dump(std::optional<sexp> port) {
-    auto prt = port.value_or(sexp_current_error_port(context));
+    auto prt = port.value_or(sexp_current_error_port(chibi.context));
     if (sexp_exceptionp(underlying)) {
-        sexp_print_exception(context, underlying, prt);
+        sexp_print_exception(chibi.context, underlying, prt);
     } else {
-        sexp_write(context, underlying, prt);
-        sexp_newline(context, prt);
+        sexp_write(chibi.context, underlying, prt);
+        sexp_newline(chibi.context, prt);
     }
 }
 
 bool SExp::operator==(const sexp &other) const {
     return sexp_unbox_boolean(
-        sexp_equalp(context, underlying, other)
+        sexp_equalp(chibi.context, underlying, other)
     );
 }
 
@@ -44,5 +45,5 @@ std::optional<bool> SExp::to() const {
 }
 
 SExp::~SExp() {
-    sexp_release_object(context, underlying);
+    sexp_release_object(chibi.context, underlying);
 }

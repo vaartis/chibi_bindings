@@ -4,14 +4,19 @@
 
 #include <chibi/eval.h>
 
+class Chibi;
+
 /** A uility class on top of sexp. */
 class SExp {
 public:
-    SExp(const sexp &context, const sexp &the_expression);
+    SExp(Chibi &chibi, sexp the_expression);
 
     operator sexp() const { return underlying; }
 
     bool operator==(const sexp &other) const;
+
+    template <typename... Args>
+    std::optional<SExp> apply(Args... args);
 
     /** Convert the expression to a value specified by a sexp_types tag.
      *
@@ -29,6 +34,8 @@ public:
     ~SExp();
 
 private:
-    sexp context;
+    Chibi &chibi;
     sexp underlying;
 };
+
+#include "SExp_impl.hpp"

@@ -26,6 +26,8 @@ SExp Chibi::make_symbol(const std::string &symbol) {
     return make_SExp(sexp_intern(context, symbol.c_str(), -1));
 }
 
+SExp Chibi::make_list() { return make_SExp(SEXP_NULL); }
+
 SExp Chibi::make_string(const std::string &str) {
     return make_SExp(sexp_c_string(context, str.c_str(), -1));
 }
@@ -35,7 +37,7 @@ SExp Chibi::make_integer(sexp_sint_t num) {
 }
 
 SExp Chibi::make_SExp(const sexp &exp) {
-    return SExp(context, exp);
+    return SExp(*this, exp);
 }
 
 Chibi::~Chibi() {
