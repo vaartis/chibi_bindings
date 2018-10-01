@@ -34,6 +34,17 @@ TEST(SExpTests, To) {
     EXPECT_EQ(lst3.to<std::string>(), "abc");
 }
 
+TEST(SExpTests, ToVecOf) {
+    Chibi chibi;
+
+    std::string str = "'(1 2 3)";
+    std::vector<sexp_sint_t> r {1, 2, 3};
+
+    SExp lst = chibi.eval_string(str);
+
+    EXPECT_EQ(lst.to_vec_of<sexp_sint_t>().value(), r);
+}
+
 TEST(SExpTests, Apply) {
     Chibi chibi;
 

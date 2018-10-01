@@ -17,3 +17,27 @@ std::optional<SExp> SExp::apply(Args... args) {
 
     return std::nullopt;
 }
+
+template <typename Output>
+std::optional<std::vector<Output>> SExp::to_vec_of() const {
+    if (sexp_listp(chibi.context, underlying)) {
+        sexp_uint_t len = chibi.make_SExp(
+            sexp_length(chibi.context, underlying)
+        ).to<sexp_sint_t>().value();
+
+        std::vector<Output> res;
+        for (sexp x = underlying; sexp_pairp(x); x = sexp_cdr(x)) {
+            SExp tr = chibi.make_SExp(sexp_car(x));
+
+            if (std::optional<Output> o = tr.to<Output>(); o.has_value()) {
+                res.push_back(o.value());
+            } else {
+                return std::nullopt; // There's a non-Output value in the list somewhere..
+            }
+        }
+
+        return res;
+    }
+
+    return std::nullopt;
+}

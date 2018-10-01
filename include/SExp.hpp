@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <optional>
 
 #include <chibi/eval.h>
@@ -18,12 +19,19 @@ public:
     template <typename... Args>
     std::optional<SExp> apply(Args... args);
 
-    /** Convert the expression to a value specified by a sexp_types tag.
+    /** Convert the expression to a value specified.
      *
      * If the value is not of this type, nullopt will be returned.
      */
     template <typename Output>
     std::optional<Output> to() const;
+
+    /** Convert the list of expressions to a vector of values specified.
+     *
+     * If the value is not of this type, nullopt will be returned.
+p     */
+    template <typename Output>
+    std::optional<std::vector<Output>> to_vec_of() const;
 
     /** Dump the text representation of the expression to a specified port (current output port, by default).
      *
