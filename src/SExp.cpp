@@ -44,6 +44,19 @@ std::optional<bool> SExp::to() const {
         : std::nullopt;
 }
 
+template <>
+std::optional<Symbol> SExp::to() const {
+    return sexp_symbolp(underlying)
+        ? std::make_optional(
+            Symbol(
+                sexp_string_data(
+                    sexp_symbol_to_string(chibi.context, underlying)
+                    )
+            )
+          )
+        : std::nullopt;
+}
+
 SExp::~SExp() {
     sexp_release_object(chibi.context, underlying);
 }

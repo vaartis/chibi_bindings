@@ -7,6 +7,17 @@
 
 class Chibi;
 
+/** A symbol, basically a wrapper around a string. */
+struct Symbol {
+    Symbol(const std::string &name) : name(name) {}
+    Symbol(const char *name) : name(name) {}
+
+    operator std::string() { return name; }
+    bool operator ==(const Symbol &other) const { return other.name == name; }
+
+    std::string name;
+};
+
 /** A uility class on top of sexp. */
 class SExp {
 public:
