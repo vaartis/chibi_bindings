@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 
 include(ExternalProject)
 
-set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
 
 project(chibi_bindings)
 add_library(chibi_bindings
