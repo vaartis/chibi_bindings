@@ -29,8 +29,7 @@ ExternalProject_Add(chibi_scheme
 
   LOG_BUILD 1
 )
-link_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/lib")
-target_link_libraries(chibi_bindings "chibi-scheme")
+target_link_libraries(chibi_bindings ${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/lib/libchibi-scheme.so)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/include")
 add_dependencies(chibi_bindings chibi_scheme)
 
