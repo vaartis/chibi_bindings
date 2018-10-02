@@ -37,7 +37,7 @@ TEST(SExpTests, To) {
 TEST(SExpTests, ToVecOf) {
     Chibi chibi;
 
-    std::string str = "'(1 2 3)";
+    std::string str = "#(1 2 3)";
     std::vector<sexp_sint_t> r {1, 2, 3};
 
     SExp lst = chibi.eval_string(str);
