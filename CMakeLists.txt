@@ -19,19 +19,19 @@ ExternalProject_Add(chibi_scheme
   GIT_REPOSITORY "https://github.com/ashinn/chibi-scheme"
   GIT_TAG "0.8"
 
-  SOURCE_DIR "${CMAKE_SOURCE_DIR}/deps/download/chibi"
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/download/chibi"
 
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ""
   BUILD_COMMAND make
-  INSTALL_COMMAND CHIBI_MODULE_PATH=${CMAKE_SOURCE_DIR}/deps/download/chibi/lib PREFIX=${CMAKE_SOURCE_DIR}/deps/chibi make install
+  INSTALL_COMMAND CHIBI_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/deps/download/chibi/lib PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi make install
   BUILD_IN_SOURCE 1
 
   LOG_BUILD 1
-  )
-link_directories("${CMAKE_SOURCE_DIR}/deps/chibi/lib")
+)
+link_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/lib")
 target_link_libraries(chibi_bindings "chibi-scheme")
-include_directories("${CMAKE_SOURCE_DIR}/deps/chibi/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/include")
 add_dependencies(chibi_bindings chibi_scheme)
 
 include(CTest)
