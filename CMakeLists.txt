@@ -13,6 +13,7 @@ add_library(chibi_bindings
 
   src/SExp.cpp
   src/Chibi.cpp
+  src/RecordTypeDescriptor.cpp
 )
 include_directories(include src)
 
@@ -41,6 +42,7 @@ find_package(GTest)
 add_executable(chibi_bindings_tests
   test/ChibiTests.cpp
   test/SExpTests.cpp
+  test/RTDTests.cpp
 )
 target_link_libraries(chibi_bindings_tests ${GTEST_BOTH_LIBRARIES} chibi_bindings)
 gtest_discover_tests(chibi_bindings_tests)

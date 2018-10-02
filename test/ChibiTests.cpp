@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include <Chibi.hpp>
+#include "Chibi.hpp"
 
 #include <iostream>
 
@@ -56,25 +56,4 @@ TEST(ChibiTests, EnvRef) {
 
     SExp exists = chibi.env_ref("assoc");
     EXPECT_NE(exists, SEXP_FALSE);
-}
-
-TEST(ChibiTests, Struct) {
-    /*
-    Chibi chibi;
-
-    auto rs = chibi.eval_strings(
-        "(import (srfi 99))",
-        "(begin"
-        " (define-record-type thing (make-thing a b) thing? (a thing-a) (b thing-b))"
-        " (make-thing 1 2)"
-        ")"
-    );
-
-    try {
-        chibi.print_exception(rs[0]);
-        chibi.print_exception(rs[1]);
-    } catch (...) {}
-
-    std::cout << chibi.sexp_to_string(rs[1]) << std::endl;
-    */
 }
