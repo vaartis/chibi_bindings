@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
 
 project(chibi_bindings)
 add_library(chibi_bindings
-  include/SExp.hpp
+  include/sexp.hpp
   include/Chibi.hpp
 
   src/SExp.cpp

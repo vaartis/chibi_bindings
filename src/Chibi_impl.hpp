@@ -4,7 +4,7 @@
 
 #include <chibi/eval.h>
 
-#include "SExp.hpp"
+#include "sexp.hpp"
 
 template <typename... Args>
 void Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...)) {

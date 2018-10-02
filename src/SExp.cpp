@@ -1,4 +1,4 @@
-#include "SExp.hpp"
+#include "sexp.hpp"
 #include "Chibi.hpp"
 
 SExp::SExp(Chibi &chibi, sexp the_expression)
