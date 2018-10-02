@@ -13,9 +13,9 @@ add_library(chibi_bindings
   src/Chibi.cpp
   src/RecordTypeDescriptor.cpp
 )
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/src
+target_include_directories(chibi_bindings
+  PUBLIC include
+  PUBLIC src
 )
 
 ExternalProject_Add(chibi_scheme
@@ -33,7 +33,9 @@ ExternalProject_Add(chibi_scheme
   LOG_BUILD 1
 )
 target_link_libraries(chibi_bindings ${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/lib/libchibi-scheme.so)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/include")
+target_include_directories(chibi_bindings
+  PUBLIC deps/chibi/include
+)
 add_dependencies(chibi_bindings chibi_scheme)
 
 include(CTest)
