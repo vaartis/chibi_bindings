@@ -13,7 +13,10 @@ add_library(chibi_bindings
   src/Chibi.cpp
   src/RecordTypeDescriptor.cpp
 )
-include_directories(include src)
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
 ExternalProject_Add(chibi_scheme
   GIT_REPOSITORY "https://github.com/ashinn/chibi-scheme"
