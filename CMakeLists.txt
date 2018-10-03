@@ -18,25 +18,50 @@ target_include_directories(chibi_bindings
   PUBLIC src
 )
 
-ExternalProject_Add(chibi_scheme
-  GIT_REPOSITORY "https://github.com/ashinn/chibi-scheme"
-  GIT_TAG "0.8"
+set(CHIBI_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi-scheme)
 
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/download/chibi"
-
-  UPDATE_COMMAND ""
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND make
-  INSTALL_COMMAND CHIBI_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/deps/download/chibi/lib PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi make install
-  BUILD_IN_SOURCE 1
-
-  LOG_BUILD 1
+# Build chibi, all libraries and an image
+add_custom_target(chibi-scheme
+  COMMAND make libchibi-scheme${CMAKE_SHARED_LIBRARY_SUFFIX} lib/chibi.img CHIBI_MODULE_PATH=${CHIBI_PATH}/lib
+  WORKING_DIRECTORY ${CHIBI_PATH}
 )
-target_link_libraries(chibi_bindings ${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi/lib/libchibi-scheme.so)
+# Make the main library depend on the custom command
+add_dependencies(chibi_bindings chibi-scheme)
+if (UNIX)
+  target_link_libraries(chibi_bindings dl) # Only need to link in dl on unix
+endif()
+
+# Copy the shared library to the final output directory
+add_custom_command(
+  COMMENT "Copying libchibi-scheme to the build output directory"
+  TARGET chibi-scheme POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CHIBI_PATH}/libchibi-scheme${CMAKE_SHARED_LIBRARY_SUFFIX}.0
+  ${CMAKE_BINARY_DIR}/libchibi-scheme${CMAKE_SHARED_LIBRARY_SUFFIX}.0
+)
+
+# Copy all the runtime things to the final output dir
+add_custom_command(
+  COMMENT "Copying runtime libraries to the build output directory"
+  TARGET chibi-scheme POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+  ${CHIBI_PATH}/lib
+  ${CMAKE_BINARY_DIR}/chibi_lib
+)
+
+# Import the shared library into CMake
+add_library(libchibi-scheme SHARED IMPORTED)
+set_target_properties(libchibi-scheme PROPERTIES
+  IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/libchibi-scheme${CMAKE_SHARED_LIBRARY_SUFFIX}.0
+)
+
+# Link to the imported library
+target_link_libraries(chibi_bindings libchibi-scheme)
 target_include_directories(chibi_bindings
-  PUBLIC deps/chibi/include
+  PUBLIC deps/chibi-scheme/include
 )
-add_dependencies(chibi_bindings chibi_scheme)
+
+# Testing
 
 include(CTest)
 include(GoogleTest)

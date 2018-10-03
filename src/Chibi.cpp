@@ -1,17 +1,20 @@
 #include <chibi/eval.h>
+#include <chibi/gc_heap.h>
 
 #include "Chibi.hpp"
 
 Chibi::Chibi() {
-    context = sexp_make_eval_context(nullptr, nullptr, nullptr, 0, 0);
-    env = sexp_context_env(context);
+    context = sexp_load_image("./chibi_lib/chibi.img", 0, 0, 0);
+    if (context != nullptr) {
+        env = sexp_context_env(context);
 
-    // FIXME: add an actual path configuration or something
-    sexp_add_module_directory(context, make_string("../deps/chibi/share/chibi/"), SEXP_TRUE);
-    sexp_add_module_directory(context, make_string("../deps/chibi/lib/chibi/"), SEXP_TRUE);
+        sexp_add_module_directory(context, make_string("./chibi_lib"), SEXP_TRUE);
 
-    sexp_load_standard_env(context, nullptr, SEXP_SEVEN);
-    sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
+        sexp_load_standard_env(context, nullptr, SEXP_SEVEN);
+        sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
+    } else {
+        throw std::runtime_error(sexp_load_image_err());
+    }
 }
 
 SExp Chibi::env_ref(const std::string &name, sexp dflt) {

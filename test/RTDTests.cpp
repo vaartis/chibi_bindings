@@ -12,7 +12,7 @@ TEST(RTDTests, AllFields) {
         "(import (srfi 99))",
         "(define-record-type a-type #t #t a)",
         "(define-record-type (b-type a-type) #t #t b)"
-   );
+    );
 
     RecordTypeDescriptor rtd(chibi, "b-type");
 
