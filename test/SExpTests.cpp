@@ -2,20 +2,32 @@
 
 #include <Chibi.hpp>
 
-TEST(SExpTests, Dump) {
+TEST(SExpTests, DumpToPort) {
     Chibi chibi;
 
     SExp outputPort = chibi.make_SExp(sexp_open_output_string(chibi.context));
 
     SExp exp = chibi.eval_string("(error \"an error\")");
-    exp.dump(outputPort);
+    exp.dump_to_port(outputPort);
 
     EXPECT_EQ(chibi.make_SExp(sexp_get_output_string(chibi.context, outputPort)).to<std::string>(), "ERROR: an error\n");
 
     SExp outputPort2 = chibi.make_SExp(sexp_open_output_string(chibi.context));
     SExp exp2 = chibi.eval_string("1");
-    exp2.dump(outputPort2);
+    exp2.dump_to_port(outputPort2);
     EXPECT_EQ(chibi.make_SExp(sexp_get_output_string(chibi.context, outputPort2)).to<std::string>(), "1\n");
+}
+
+TEST(SExpTests, DumpToString) {
+    Chibi chibi;
+
+    SExp exp = chibi.eval_string("(error \"an error\")");
+
+
+    EXPECT_EQ(exp.dump_to_string(), "ERROR: an error\n");
+
+    SExp exp2 = chibi.eval_string("1");
+    EXPECT_EQ(exp2.dump_to_string(), "1\n");
 }
 
 TEST(SExpTests, To) {

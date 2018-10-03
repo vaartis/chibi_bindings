@@ -48,7 +48,10 @@ p     */
      *
      * This function also converts exceptions to show their inner text.
      */
-    void dump(std::optional<sexp> port = std::nullopt);
+    void dump_to_port(std::optional<sexp> port = std::nullopt);
+
+    /** A wrapper around SExp::dump_to_port() that creates a port and reads from it to a string. */
+    std::string dump_to_string();
 
     ~SExp();
 
