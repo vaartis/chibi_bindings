@@ -34,10 +34,11 @@ public:
      */
     std::optional<SExp> get_field_from(SExp obj, std::string field);
 
+    /** The RTD's name. */
+    std::string type_name;
+
 private:
     Chibi &chibi;
-
-    std::string type_name;
 
     SExp rtd = chibi.env_ref(type_name);
 
