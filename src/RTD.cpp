@@ -1,8 +1,8 @@
 #include <algorithm>
 
-#include "RecordTypeDescriptor.hpp"
+#include "RTD.hpp"
 
-RecordTypeDescriptor::RecordTypeDescriptor(Chibi &chibi, const std::string &type_name) : chibi(chibi), type_name(type_name) {
+RTD::RTD(Chibi &chibi, const std::string &type_name) : chibi(chibi), type_name(type_name) {
     SExp is_type_rtd = is_rtd.apply(rtd).value();
 
     if (!is_type_rtd.to<bool>()) {
@@ -10,7 +10,7 @@ RecordTypeDescriptor::RecordTypeDescriptor(Chibi &chibi, const std::string &type
     }
 }
 
-std::vector<Symbol> RecordTypeDescriptor::fields(bool with_parent) {
+std::vector<Symbol> RTD::fields(bool with_parent) {
     if (with_parent) {
         return rtd_all_field_names.apply(rtd)->to_vec_of<Symbol>().value();
     } else {
@@ -19,12 +19,12 @@ std::vector<Symbol> RecordTypeDescriptor::fields(bool with_parent) {
 }
 
 
-bool RecordTypeDescriptor::obj_is(SExp obj) {
+bool RTD::obj_is(SExp obj) {
     auto predicate = rtd_predicate.apply(rtd); // Create the predicate function
     return predicate->apply(obj)->to<bool>().value();
 }
 
-RecordTypeDescriptor::SetFieldResult RecordTypeDescriptor::set_field_for(SExp obj, std::string field, SExp value) {
+RTD::SetFieldResult RTD::set_field_for(SExp obj, std::string field, SExp value) {
     if (obj_is(obj)) { // Is it of the needed type
         auto all_fields = fields();
 
@@ -41,7 +41,7 @@ RecordTypeDescriptor::SetFieldResult RecordTypeDescriptor::set_field_for(SExp ob
     return SetFieldResult::WrongType;
 }
 
-std::optional<SExp> RecordTypeDescriptor::get_field_from(SExp obj, std::string field) {
+std::optional<SExp> RTD::get_field_from(SExp obj, std::string field) {
     if (obj_is(obj)) {
         auto all_fields = fields();
 

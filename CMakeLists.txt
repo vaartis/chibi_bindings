@@ -11,7 +11,7 @@ add_library(chibi_bindings
 
   src/SExp.cpp
   src/Chibi.cpp
-  src/RecordTypeDescriptor.cpp
+  src/RTD.cpp
 )
 target_include_directories(chibi_bindings
   PUBLIC include

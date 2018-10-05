@@ -2,10 +2,10 @@
 #include "Chibi.hpp"
 
 /** A record type descriptor wrapper for scheme records as defined in SRFI-99. */
-class RecordTypeDescriptor {
+class RTD {
 public:
     /** Construct an RTD for a type named \a type_name */
-    RecordTypeDescriptor(Chibi &chibi, const std::string &type_name);
+    RTD(Chibi &chibi, const std::string &type_name);
 
     /** List the fields that the record has. */
     std::vector<Symbol> fields(bool with_parent = true);
