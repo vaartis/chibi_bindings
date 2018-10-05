@@ -40,7 +40,7 @@ public:
     /** Convert the list of expressions to a vector of values specified.
      *
      * If the value is not of this type, nullopt will be returned.
-p     */
+     */
     template <typename Output>
     std::optional<std::vector<Output>> to_vec_of() const;
 
