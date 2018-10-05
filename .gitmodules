@@ -1,4 +1,4 @@
 [submodule "chibi-scheme"]
 	path = deps/chibi-scheme
-	url = https://github.com/vaartis/chibi-scheme
-    branch = gc-heap-extern-c
+	url = https://github.com/ashinn/chibi-scheme
+    branch = master
