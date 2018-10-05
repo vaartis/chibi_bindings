@@ -8,13 +8,17 @@ Chibi::Chibi() {
     if (context != nullptr) {
         env = sexp_context_env(context);
 
-        sexp_add_module_directory(context, make_string("./chibi_lib"), SEXP_TRUE);
+        add_module_directory("./chibi_lib");
 
         sexp_load_standard_env(context, nullptr, SEXP_SEVEN);
         sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
     } else {
         throw std::runtime_error(sexp_load_image_err());
     }
+}
+
+SExp Chibi::add_module_directory(std::string dir) {
+    return make_SExp(sexp_add_module_directory(context, make_string(dir), SEXP_TRUE));
 }
 
 SExp Chibi::env_ref(const std::string &name, sexp dflt) {
