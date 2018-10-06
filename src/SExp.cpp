@@ -47,7 +47,7 @@ std::optional<Symbol> SExp::to() const {
         : std::nullopt;
 }
 
-void SExp::for_each(std::function<void(SExp)> f) {
+void SExp::for_each(std::function<void(SExp)> f) const {
     if (sexp_vectorp(underlying)) {
         sexp_uint_t len = sexp_vector_length(underlying);
         auto vecdata = sexp_vector_data(underlying);
@@ -66,7 +66,7 @@ void SExp::for_each(std::function<void(SExp)> f) {
     }
 }
 
-void SExp::dump_to_port(std::optional<sexp> port) {
+void SExp::dump_to_port(std::optional<sexp> port) const {
     auto prt = port.value_or(sexp_current_error_port(chibi.context));
     if (sexp_exceptionp(underlying)) {
         sexp_print_exception(chibi.context, underlying, prt);
@@ -76,7 +76,7 @@ void SExp::dump_to_port(std::optional<sexp> port) {
     }
 }
 
-std::string SExp::dump_to_string() {
+std::string SExp::dump_to_string() const {
     auto prt = chibi.make_SExp(sexp_open_output_string(chibi.context));
     dump_to_port(prt);
 

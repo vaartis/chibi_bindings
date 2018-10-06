@@ -29,7 +29,7 @@ public:
     bool operator==(const sexp &other) const;
 
     template <typename... Args>
-    std::optional<SExp> apply(Args... args);
+    std::optional<SExp> apply(Args... args) const;
 
     /** Convert the expression to a value specified.
      *
@@ -49,16 +49,16 @@ public:
      *
      * If the underlying value is neither a list, nor a vector, this function does nothing.
      */
-    void for_each(std::function<void(SExp)> f);
+    void for_each(std::function<void(SExp)> f) const;
 
     /** Dump the text representation of the expression to a specified port (current output port, by default).
      *
      * This function also converts exceptions to show their inner text.
      */
-    void dump_to_port(std::optional<sexp> port = std::nullopt);
+    void dump_to_port(std::optional<sexp> port = std::nullopt) const;
 
     /** A wrapper around SExp::dump_to_port() that creates a port and reads from it to a string. */
-    std::string dump_to_string();
+    std::string dump_to_string() const;
 
     ~SExp();
 

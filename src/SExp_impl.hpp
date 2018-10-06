@@ -7,7 +7,7 @@
 #include "Chibi.hpp"
 
 template <typename... Args>
-std::optional<SExp> SExp::apply(Args... args) {
+std::optional<SExp> SExp::apply(Args... args) const {
     if (sexp_applicablep(underlying)) {
         SExp args_lst = chibi.make_list(args...);
         return chibi.make_SExp(
