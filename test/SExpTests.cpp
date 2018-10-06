@@ -60,6 +60,31 @@ TEST(SExpTests, ToVecOf) {
     EXPECT_EQ(ls.to_vec_of<sexp_sint_t>().value(), r);
 }
 
+TEST(SExpTests, ForEach) {
+    Chibi chibi;
+
+    std::string str = "#(1 2 3)";
+    std::string str_l = "'(1 2 3)";
+    int x1 = 0, x2 = 0;
+
+    SExp vc = chibi.eval_string(str);
+    SExp ls = chibi.eval_string(str_l);
+
+    vc.for_each([&x1](auto exp) {
+                    x1 += exp.template to<sexp_sint_t>().value();
+                }
+    );
+
+    ls.for_each([&x2](auto exp) {
+                    x2 += exp.template to<sexp_sint_t>().value();
+                  }
+    );
+
+    EXPECT_EQ(x1, x2);
+    EXPECT_EQ(x1, 6);
+}
+
+
 TEST(SExpTests, Apply) {
     Chibi chibi;
 

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <optional>
+#include <functional>
 
 #include <chibi/eval.h>
 
@@ -43,6 +44,12 @@ public:
      */
     template <typename Output>
     std::optional<std::vector<Output>> to_vec_of() const;
+
+    /** Run the provided function on every element of the underlying list or vector.
+     *
+     * If the underlying value is neither a list, nor a vector, this function does nothing.
+     */
+    void for_each(std::function<void(SExp)> f);
 
     /** Dump the text representation of the expression to a specified port (current output port, by default).
      *

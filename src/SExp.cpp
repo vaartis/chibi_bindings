@@ -47,6 +47,25 @@ std::optional<Symbol> SExp::to() const {
         : std::nullopt;
 }
 
+void SExp::for_each(std::function<void(SExp)> f) {
+    if (sexp_vectorp(underlying)) {
+        sexp_uint_t len = sexp_vector_length(underlying);
+        auto vecdata = sexp_vector_data(underlying);
+
+        for (int i = 0; i < len; i++) {
+            SExp tr = chibi.make_SExp(vecdata[i]);
+
+            f(tr);
+        }
+    } else if (sexp_pairp(underlying)) {
+        for (auto i = underlying; sexp_pairp(i); i = sexp_cdr(i)) {
+            SExp tr = chibi.make_SExp(sexp_car(i));
+
+            f(tr);
+        }
+    }
+}
+
 void SExp::dump_to_port(std::optional<sexp> port) {
     auto prt = port.value_or(sexp_current_error_port(chibi.context));
     if (sexp_exceptionp(underlying)) {
