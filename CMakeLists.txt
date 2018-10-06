@@ -22,7 +22,7 @@ set(CHIBI_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi-scheme)
 
 # Build chibi, all libraries and an image
 add_custom_target(chibi-scheme
-  COMMAND make libchibi-scheme${CMAKE_SHARED_LIBRARY_SUFFIX} lib/chibi.img CHIBI_MODULE_PATH=${CHIBI_PATH}/lib
+  COMMAND make libchibi-scheme${CMAKE_SHARED_LIBRARY_SUFFIX} all-libs CHIBI_MODULE_PATH=${CHIBI_PATH}/lib
   WORKING_DIRECTORY ${CHIBI_PATH}
 )
 # Make the main library depend on the custom command

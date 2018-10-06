@@ -4,17 +4,14 @@
 #include "Chibi.hpp"
 
 Chibi::Chibi() {
-    context = sexp_load_image("./chibi_lib/chibi.img", 0, 0, 0);
-    if (context != nullptr) {
-        env = sexp_context_env(context);
+    context = sexp_make_eval_context(nullptr, nullptr, nullptr, 0, 0);
 
-        add_module_directory("./chibi_lib");
+    add_module_directory("./chibi_lib");
 
-        sexp_load_standard_env(context, nullptr, SEXP_SEVEN);
-        sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
-    } else {
-        throw std::runtime_error(sexp_load_image_err());
-    }
+    sexp_load_standard_env(context, nullptr, SEXP_SEVEN);
+    sexp_load_standard_ports(context, nullptr, stdin, stdout, stderr, 1);
+
+    env = sexp_context_env(context);
 }
 
 SExp Chibi::add_module_directory(std::string dir) {
