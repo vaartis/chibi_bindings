@@ -37,7 +37,7 @@ public:
     template <typename Output>
     std::optional<Output> to() const;
 
-    /** Convert the list of expressions to a vector of values specified.
+    /** Convert a vector or a list of expressions to an std::vector of specified type.
      *
      * If the value is not of this type, nullopt will be returned.
      */
