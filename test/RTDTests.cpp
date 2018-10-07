@@ -5,6 +5,23 @@
 
 #include <iostream>
 
+TEST(RTDTests, Constructors) {
+    Chibi chibi;
+
+    chibi.eval_strings(
+        "(import (srfi 99))",
+        "(define-record-type a-type #t #t a)"
+    );
+
+    RTD rtd1(chibi, "a-type");
+
+    SExp a_type_env_ref = chibi.env_ref("a-type");
+
+    RTD rtd2(chibi, a_type_env_ref);
+
+    EXPECT_TRUE(rtd1 == rtd2); // EXPECT_EQ doesnt work with these..
+}
+
 TEST(RTDTests, AllFields) {
     Chibi chibi;
 

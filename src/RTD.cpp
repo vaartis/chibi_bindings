@@ -3,11 +3,27 @@
 #include "RTD.hpp"
 
 RTD::RTD(Chibi &chibi, const std::string &type_name) : chibi(chibi), type_name(type_name) {
-    SExp is_type_rtd = is_rtd.apply(rtd).value();
+    rtd = chibi.env_ref(type_name);
 
+    SExp is_type_rtd = is_rtd.apply(rtd).value();
     if (!is_type_rtd.to<bool>()) {
         throw std::invalid_argument(type_name + " is not a record type descriptor");
     }
+}
+
+RTD::RTD(Chibi &chibi, SExp sxp) : chibi(chibi) {
+    rtd = sxp;
+
+    SExp is_type_rtd = is_rtd.apply(rtd).value();
+    if (!is_type_rtd.to<bool>()) {
+        throw std::invalid_argument("A sexp that is not a record type descriptor was passed to RTD");
+    }
+
+    type_name = rtd_name.apply(sxp)->to<Symbol>().value();
+}
+
+bool RTD::operator==(const RTD &other) {
+    return rtd == other.rtd;
 }
 
 std::vector<Symbol> RTD::fields(bool with_parent) {

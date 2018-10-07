@@ -4,8 +4,13 @@
 /** A record type descriptor wrapper for scheme records as defined in SRFI-99. */
 class RTD {
 public:
+    /** Construct an RTD from a sexp. */
+    RTD(Chibi &chibi, SExp sexp);
+
     /** Construct an RTD for a type named \a type_name */
     RTD(Chibi &chibi, const std::string &type_name);
+
+    bool operator==(const RTD &other);
 
     /** List the fields that the record has. */
     std::vector<Symbol> fields(bool with_parent = true);
@@ -40,7 +45,9 @@ public:
 private:
     Chibi &chibi;
 
-    SExp rtd = chibi.env_ref(type_name);
+    SExp rtd = SExp(chibi);
+
+    SExp rtd_name = chibi.env_ref("rtd-name");
 
     SExp is_rtd = chibi.env_ref("rtd?");
     SExp rtd_predicate = chibi.env_ref("rtd-predicate");
