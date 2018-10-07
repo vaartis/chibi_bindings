@@ -22,11 +22,24 @@ struct Symbol {
 /** A uility class on top of sexp. */
 class SExp {
 public:
+    /** Create a SExp wrapper from the expression. */
     SExp(Chibi &chibi, sexp the_expression);
+
+    /** Creates a SExp with an underlying SEXP_NULL. */
+    SExp(Chibi &chibi);
+
+    /** A copy constructor, copies the underlying sexp and the associated Chibi and increments it's GC counter. */
+    SExp(const SExp &other);
 
     operator sexp() const { return underlying; }
 
     bool operator==(const sexp &other) const;
+
+    /** Copy assignment, copies the underlying sexp and it's associated Chibi and increments the GC counter
+     *
+     * The GC counter will be decremented as needed.
+     */
+    SExp &operator=(const SExp &other);
 
     template <typename... Args>
     std::optional<SExp> apply(Args... args) const;

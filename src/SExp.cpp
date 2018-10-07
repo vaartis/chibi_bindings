@@ -1,10 +1,32 @@
 #include "sexp.hpp"
 #include "Chibi.hpp"
 
+SExp::SExp(const SExp &other)
+    : chibi(other.chibi)
+    , underlying(other) {
+    sexp_preserve_object(chibi.context, underlying);
+}
+
+SExp::SExp(Chibi &chibi) : chibi(chibi) {
+    SExp(chibi, SEXP_NULL);
+}
+
 SExp::SExp(Chibi &chibi, sexp the_expression)
     : chibi(chibi)
     , underlying(the_expression) {
     sexp_preserve_object(chibi.context, underlying);
+}
+
+SExp &SExp::operator=(const SExp &other) {
+    sexp_release_object(chibi.context, underlying);
+
+    chibi = other.chibi;
+    underlying = other;
+
+    // Increment the GC counter for the new object
+    sexp_preserve_object(chibi.context, underlying);
+
+    return *this;
 }
 
 bool SExp::operator==(const sexp &other) const {
