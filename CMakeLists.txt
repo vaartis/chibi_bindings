@@ -65,11 +65,14 @@ target_include_directories(chibi_bindings
 
 include(CTest)
 include(GoogleTest)
-find_package(GTest)
+
+set(BUILD_GMOCK NO)
+set(INSTALL_GTEST NO)
+add_subdirectory(deps/gtest)
 add_executable(chibi_bindings_tests
   test/ChibiTests.cpp
   test/SExpTests.cpp
   test/RTDTests.cpp
 )
-target_link_libraries(chibi_bindings_tests ${GTEST_BOTH_LIBRARIES} chibi_bindings)
+target_link_libraries(chibi_bindings_tests gtest_main chibi_bindings)
 gtest_discover_tests(chibi_bindings_tests)

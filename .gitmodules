@@ -2,3 +2,6 @@
 	path = deps/chibi-scheme
 	url = https://github.com/ashinn/chibi-scheme
     branch = master
+[submodule "gtest"]
+	path = deps/gtest
+	url = https://github.com/google/googletest
