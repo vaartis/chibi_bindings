@@ -66,9 +66,19 @@ target_include_directories(chibi_bindings
 include(CTest)
 include(GoogleTest)
 
-set(BUILD_GMOCK NO)
-set(INSTALL_GTEST NO)
+set(BUILD_GMOCK NO CACHE BOOL "Don't build GMock" FORCE)
+set(INSTALL_GTEST NO CACHE BOOL "Don't install GTest" FORCE)
 add_subdirectory(deps/gtest)
+set_target_properties(gtest_main PROPERTIES # Make gtest NOT create lib/bin directories
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+  PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
+set_target_properties(gtest PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+  PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
 add_executable(chibi_bindings_tests
   test/ChibiTests.cpp
   test/SExpTests.cpp
