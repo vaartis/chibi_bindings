@@ -17,10 +17,12 @@ TEST(ChibiTests, CallCFunction) {
     Chibi chibi;
 
     auto f = +[](sexp ctx, sexp self, long n, sexp arg) { return arg; };
-    chibi.register_function("f", f);
+    auto ff = chibi.register_function("f", f);
     SExp res = chibi.eval_string("(f 10)");
+    SExp res2 = ff.apply(chibi.make_integer(11)).value();
 
     EXPECT_EQ(res.to<sexp_sint_t>(), 10);
+    EXPECT_EQ(res2.to<sexp_sint_t>(), 11);
 }
 
 TEST(ChibiTests, MakeList) {

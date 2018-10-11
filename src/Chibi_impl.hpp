@@ -7,8 +7,9 @@
 #include "sexp.hpp"
 
 template <typename... Args>
-void Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...)) {
-    sexp_define_foreign(context, env, name.c_str(), sizeof...(Args), fnc);
+SExp Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...)) {
+    return make_SExp(sexp_define_foreign(context, env, name.c_str(), sizeof...(Args), fnc));
+}
 
 template<typename T>
 SExp Chibi::make_cpointer(T *ptr) {

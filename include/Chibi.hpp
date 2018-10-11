@@ -27,7 +27,7 @@ public:
         @arg fnc the function pointer to use
      */
     template <typename... Args>
-    void register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...));
+    SExp register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...));
 
     /** Add a directory to the module loading path. */
     SExp add_module_directory(std::string dir);
