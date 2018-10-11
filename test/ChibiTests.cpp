@@ -82,6 +82,6 @@ TEST(ChibiTests, MakeCPointerAndToPtr) {
     sexp_tag_t objtype2 = sexp_type_tag(sexp_object_type(chibi.context, sexp(s2_ptr)));
 
     EXPECT_EQ(objtype1, objtype2);
-    EXPECT_EQ(p.get(), s_ptr.to_ptr<int>().value());
-    EXPECT_EQ(p2.get(), s2_ptr.to_ptr<int>().value());
+    EXPECT_EQ(p.get(), s_ptr.to_ptr<int>());
+    EXPECT_EQ(p2.get(), s2_ptr.to_ptr<int>());
 }
