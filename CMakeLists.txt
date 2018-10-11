@@ -18,7 +18,8 @@ add_library(chibi_bindings
 target_include_directories(chibi_bindings
   PUBLIC include
   PUBLIC src
-)
+  )
+target_compile_options(chibi_bindings PUBLIC -Wno-array-bounds) # Works incorrectly with chibi
 
 set(CHIBI_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/chibi-scheme)
 
