@@ -59,35 +59,20 @@ TEST(ChibiTests, EnvRef) {
     EXPECT_NE(exists, SEXP_FALSE);
 }
 
-struct Testy {
-    Testy(int x) : x(x) { }
-    int x;
-
-    sexp fnc(sexp context, sexp self, long n, sexp arg1) {
-
-        return SEXP_NULL;
-    }
-};
-
-TEST(ChibiTests, Struct) {
+TEST(ChibiTests, MakeCPointerAndToPtr) {
     Chibi chibi;
 
-    std::shared_ptr<Testy> xv = std::make_shared<Testy>(10);
+    auto p = std::make_shared<int>(10);
+    auto p2 = std::make_shared<int>(11);
+    auto p3 = std::make_shared<int>(11);
 
-    auto f = +[](sexp ctx, sexp self, long n, sexp this_ptr, sexp arg1) {
-                  Testy *testy_ptr = reinterpret_cast<Testy *>(sexp_cpointer_value(this_ptr));
-                  int arg1_i = sexp_unbox_fixnum(arg1);
-                  testy_ptr->x = arg1_i;
+    SExp s_ptr = chibi.make_cpointer(p.get());
+    SExp s2_ptr = chibi.make_cpointer(p2.get());
 
-                  return SEXP_NULL;
-              };
+    sexp_tag_t objtype1 = sexp_type_tag(sexp_object_type(chibi.context, sexp(s_ptr)));
+    sexp_tag_t objtype2 = sexp_type_tag(sexp_object_type(chibi.context, sexp(s2_ptr)));
 
-    sexp testy_type = sexp_register_c_type(chibi.context, chibi.make_string("testy-type"), nullptr);
-    sexp xv_ptr = sexp_make_cpointer(chibi.context, sexp_type_tag(testy_type), xv.get(), chibi.context, 0);
-
-    chibi.register_function("fnc", f);
-    SExp ff = chibi.env_ref("fnc");
-    ff.apply(xv_ptr, chibi.make_integer(11))->dump_to_port();
-
-    std::cout << xv->x;
+    EXPECT_EQ(objtype1, objtype2);
+    EXPECT_EQ(p.get(), s_ptr.to_ptr<int>().value());
+    EXPECT_EQ(p2.get(), s2_ptr.to_ptr<int>().value());
 }

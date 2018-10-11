@@ -39,6 +39,14 @@ public:
     /** Look up a value in the environment and return it, otherwise return \p dflt. */
     SExp env_ref(const std::string &name, sexp dflt = SEXP_FALSE);
 
+    /** Create a scheme cpointer to an actual pointer of T.
+
+        The pointer will not be freed by scheme, which means you will need to free it yourself.
+        The scheme name of the type will be the one returnred by typeid (which varies between compilers).
+     */
+    template<typename T>
+    SExp make_cpointer(T *ptr);
+
     /** Make, or "intern", a symbol from a given string.  */
     SExp make_symbol(const std::string &symbol);
 

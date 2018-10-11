@@ -6,6 +6,19 @@
 
 #include "Chibi.hpp"
 
+template <typename Output>
+std::optional<Output *> SExp::to_ptr() const {
+    std::string type_name = std::string("--cpointer-type-") + typeid(Output).name();
+
+    if (SExp sexp_type = chibi.env_ref(type_name); sexp_type != SEXP_FALSE) {
+        if (chibi.make_SExp(sexp_object_type(chibi.context, sexp(underlying))) == sexp_type) {
+            return static_cast<Output *>(sexp_cpointer_value(underlying));
+        }
+    }
+
+    return std::nullopt;
+}
+
 template <typename... Args>
 std::optional<SExp> SExp::apply(Args... args) const {
     if (sexp_applicablep(underlying)) {

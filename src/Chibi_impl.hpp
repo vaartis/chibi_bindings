@@ -9,6 +9,22 @@
 template <typename... Args>
 void Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...)) {
     sexp_define_foreign(context, env, name.c_str(), sizeof...(Args), fnc);
+
+template<typename T>
+SExp Chibi::make_cpointer(T *ptr) {
+    auto type_name = std::string("--cpointer-type-") + typeid(T).name(); // Make a type name that will be unique for every type
+
+    SExp sexp_type = env_ref(type_name);
+    if (sexp_type == SEXP_FALSE) {
+        sexp_type = make_SExp(sexp_register_c_type(context, make_string(type_name), nullptr));
+
+        // Save the type for future use
+        sexp_env_define(context, env, make_symbol(type_name), sexp_type);
+    }
+
+    return make_SExp(
+        sexp_make_cpointer(context, sexp_type_tag(sexp(sexp_type)), ptr, SEXP_FALSE, 0)
+    );
 }
 
 template <typename Elem, typename... Elems>

@@ -52,6 +52,13 @@ public:
     template <typename Output>
     std::optional<Output> to() const;
 
+    /** Convert the expression from a scheme cpointer to a pointer value specified.
+     *
+     * If the value is not of this type, nullopt will be returned.
+     */
+    template <typename Output>
+    std::optional<Output *> to_ptr() const;
+
     /** Convert a vector or a list of expressions to an std::vector of specified type.
      *
      * If the value is not of this type, nullopt will be returned.
