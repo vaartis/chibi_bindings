@@ -43,6 +43,13 @@ std::optional<sexp_sint_t> SExp::to() const {
 }
 
 template <>
+std::optional<float> SExp::to() const {
+    return sexp_flonump(underlying)
+        ? std::make_optional(sexp_flonum_value(underlying))
+        : std::nullopt;
+}
+
+template <>
 std::optional<std::string> SExp::to() const {
     return sexp_stringp(underlying)
         ? std::make_optional(std::string(sexp_string_data(underlying)))

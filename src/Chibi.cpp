@@ -36,6 +36,10 @@ SExp Chibi::make_string(const std::string &str) {
     return make_SExp(sexp_c_string(context, str.c_str(), -1));
 }
 
+SExp Chibi::make_float(float num) {
+    return make_SExp(sexp_make_flonum(context, num));
+}
+
 SExp Chibi::make_integer(sexp_sint_t num) {
     return make_SExp(sexp_make_integer(context, num));
 }

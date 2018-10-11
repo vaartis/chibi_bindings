@@ -51,6 +51,13 @@ TEST(ChibiTests, MakeInteger) {
     EXPECT_EQ(res.to<sexp_sint_t>(), 128);
 }
 
+TEST(ChibiTests, MakeFloat) {
+    Chibi chibi;
+
+    SExp res = chibi.make_float(10.1);
+    EXPECT_FLOAT_EQ(*res.to<float>(), 10.1);
+}
+
 TEST(ChibiTests, EnvRef) {
     Chibi chibi;
 
