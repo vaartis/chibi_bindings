@@ -85,3 +85,51 @@ TEST(ChibiTests, MakeCPointerAndToPtr) {
     EXPECT_EQ(p.get(), s_ptr.to_ptr<int>());
     EXPECT_EQ(p2.get(), s2_ptr.to_ptr<int>());
 }
+
+template<typename Class>
+class ChibiClassRegistrator {
+public:
+    ChibiClassRegistrator(Chibi &chibi, Class *class_ptr) : chibi(chibi), class_ptr(class_ptr) {
+
+    }
+
+    // template<typename ReturnType, typename... Args>
+    // static call_function
+
+    template<typename ReturnType, typename... Args>
+    SExp register_function(std::string &name, ReturnType (Class::*member_function)(Args...)) {
+        auto memfn_ptr = new decltype(member_function);
+
+        auto freeing_fnc = +[](sexp context, sexp member) {
+                                auto member_cpp = static_cast<decltype(member_function) *>(sexp_cpointer_value(member));
+                                delete member_cpp;
+                            };
+
+        SExp memfn_ptr_type = chibi.make_SExp(sexp_register_c_type(chibi.context, chibi.make_string(typeid(memfn_ptr).name()), freeing_fnc));
+
+        SExp wrapped_memfn_ptr = sexp_make_cpointer(chibi.context, memfn_ptr_type, memfn_ptr, SEXP_FALSE, 1);
+    }
+private:
+    Chibi &chibi;
+    Class *class_ptr;
+    SExp class_ptr_sexp;
+};
+
+template<typename T>
+SExp register_class(Chibi &chibi, std::string name) {
+    auto this_ptr = std::make_shared<T>();
+    SExp class_ptr_sexp = chibi.make_cpointer(class_ptr);
+
+    return ChibiClassRegistrator(chibi, this_ptr);
+}
+
+TEST(ChibiTests, MemberFunctionCall) {
+    Chibi chibi;
+
+    struct Testy {
+        int fnc(int x) { return x + 1; }
+    };
+
+    register_class<Testy>(chibi, "testy");
+
+}
