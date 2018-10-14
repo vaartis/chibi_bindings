@@ -10,6 +10,7 @@ class SExp;
 class Chibi {
 public:
     Chibi();
+    Chibi(sexp context);
 
     /** Evaluates a string as a scheme expression and returns the result. */
     SExp eval_string(const std::string &str);
@@ -28,6 +29,31 @@ public:
      */
     template <typename... Args>
     SExp register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...));
+
+    /** Class that helps adding C++ class members to scheme. */
+    template<typename Class>
+    class ClassRegistrator {
+    public:
+        /** Create an instance that will prepand \a name to it's members when registering. */
+        ClassRegistrator(Chibi &chibi, std::string &name);
+
+        /** Register a member function and add it to scheme under the name "<class-name>-<member-name>".
+         *
+         * The registered function will accept a cpointer with a pointer to the class used as `this` and all
+         * other arguments after that will be passed to the function. They'll be converted from sexp to C++
+         * using the #make_from function. The result will be converted from C++ back to scheme using the #SExp.to
+         * function.
+         */
+        template<typename Return, typename... Args>
+        ClassRegistrator<Class> &register_method(std::string &&name, Return (Class::*member_function)(Args...));
+    private:
+        Chibi &chibi;
+
+        std::string &class_name;
+    };
+
+    template<typename Class>
+    ClassRegistrator<Class> register_class(std::string name);
 
     /** Add a directory to the module loading path. */
     SExp add_module_directory(std::string dir);
@@ -67,14 +93,25 @@ public:
     /** Wraps a sexp into a SExp class */
     SExp make_SExp(const sexp &exp);
 
+
+    SExp make_from(sexp_sint_t from);
+    SExp make_from(std::string from);
+    SExp make_from(float from);
+    template<typename T>
+    SExp make_from(std::vector<T> &from);
+
     ~Chibi();
 
     /** Current context used in this instance. */
     sexp context;
 
 private:
+    /** If the context is borrowed, we should not destroy it when we destroy the class. */
+    bool borrowed_context = false;
+
     /** Current environment used in the context */
     sexp env;
 };
 
 #include "Chibi_impl.hpp"
+#include "ClassRegistrator_impl.hpp"

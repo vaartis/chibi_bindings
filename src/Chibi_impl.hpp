@@ -43,3 +43,8 @@ std::vector<SExp> Chibi::eval_strings(const Args &...strs) {
 
     return res;
 }
+
+template<typename Class>
+Chibi::ClassRegistrator<Class> Chibi::register_class(std::string name) {
+    return ClassRegistrator<Class>(*this, name);
+}

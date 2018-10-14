@@ -14,6 +14,18 @@ Chibi::Chibi() {
     env = sexp_context_env(context);
 }
 
+Chibi::Chibi(sexp context) {
+    if (!sexp_contextp(context)) {
+        throw std::runtime_error("Passed object is not a context");
+    }
+
+    this->context = context;
+    env = sexp_context_env(context);
+
+    // The context is borrowed, do not destroy it
+    borrowed_context = true;
+}
+
 SExp Chibi::add_module_directory(std::string dir) {
     return make_SExp(sexp_add_module_directory(context, make_string(dir), SEXP_TRUE));
 }
@@ -48,6 +60,25 @@ SExp Chibi::make_SExp(const sexp &exp) {
     return SExp(*this, exp);
 }
 
+SExp Chibi::make_from(sexp_sint_t from) {
+    return make_integer(from);
+}
+
+SExp Chibi::make_from(std::string from) {
+    return make_string(from);
+}
+
+SExp Chibi::make_from(float from) {
+    return make_float(from);
+}
+
+template<typename T>
+SExp Chibi::make_from(std::vector<T> &from) {
+    return make_float(from);
+}
+
 Chibi::~Chibi() {
-    sexp_destroy_context(context);
+    if (!borrowed_context) {
+        sexp_destroy_context(context);
+    }
 }
