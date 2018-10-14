@@ -8,9 +8,6 @@ option(CHIBI_BINDINGS_BUILD_TESTS "Build tests" NO)
 
 project(chibi_bindings)
 add_library(chibi_bindings
-  include/sexp.hpp
-  include/Chibi.hpp
-
   src/SExp.cpp
   src/Chibi.cpp
   src/RTD.cpp
