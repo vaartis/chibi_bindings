@@ -5,6 +5,16 @@
 namespace { // Implementation detail, so it's in an anon namespace
     template<typename Class>
     struct ClassRegistratorHelpers {
+        template<typename FieldType>
+        static sexp field_get(sexp context, sexp self, long n, sexp this_ptr_sexp) {
+            auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+            auto member_ptr = static_cast<FieldType Class::**>(sexp_cpointer_value(sexp_opcode_data(self)));
+
+            Chibi chibi(context);
+
+            return chibi.make_from(this_ptr->**member_ptr);
+        }
+
         template<typename Return, typename Arg1>
         static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1) {
             auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
@@ -66,6 +76,26 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(
 
     std::string full_name = class_name + "-" + name;
     chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template call<Return, Args...>, wrapped_memfn_ptr);
+
+    return *this;
+}
+
+
+template<typename Class>
+template<typename FieldType>
+Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(std::string &&name, FieldType Class::*field) {
+    auto field_ptr = new decltype(field)(field);
+
+    auto field_freeing_fun = +[](sexp ptr_to_free) {
+                                  // Free the pointer we've created
+                                  delete static_cast<decltype(field_ptr)>(sexp_cpointer_value(ptr_to_free));
+                              };
+
+    SExp field_ptr_type = chibi.make_SExp(sexp_register_c_type(chibi.context, chibi.make_string(typeid(field_ptr).name()), field_freeing_fun));
+    SExp wrapped_field_ptr = chibi.make_SExp(sexp_make_cpointer(chibi.context, sexp_type_tag(sexp(field_ptr_type)), field_ptr, SEXP_FALSE, 1));
+
+    std::string full_name = class_name + "-" + name;
+    chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template field_get<FieldType>, wrapped_field_ptr);
 
     return *this;
 }

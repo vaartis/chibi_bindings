@@ -47,6 +47,9 @@ public:
          */
         template<typename Return, typename... Args>
         ClassRegistrator<Class> &register_method(std::string &&name, Return (Class::*member_function)(Args...));
+
+        template<typename FieldType>
+        ClassRegistrator<Class> &register_field(std::string &&name, FieldType Class::*field);
     private:
         Chibi &chibi;
 
