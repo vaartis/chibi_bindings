@@ -4,7 +4,7 @@
 
 namespace { // Implementation detail, so it's in an anon namespace
     template<typename Class>
-    struct CallFunction {
+    struct ClassRegistratorHelpers {
         template<typename Return, typename Arg1>
         static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1) {
             auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
@@ -13,7 +13,7 @@ namespace { // Implementation detail, so it's in an anon namespace
             Chibi chibi(context);
 
             Return res = (this_ptr->**fnc_ptr)(
-                CallFunction<Class>::convert<Arg1>(chibi, arg1)
+                ClassRegistratorHelpers<Class>::convert<Arg1>(chibi, arg1)
             );
 
             return chibi.make_from(res);
@@ -27,8 +27,8 @@ namespace { // Implementation detail, so it's in an anon namespace
             Chibi chibi(context);
 
             Return res = (this_ptr->**fnc_ptr)(
-                CallFunction<Class>::convert<Arg1>(chibi, arg1),
-                CallFunction<Class>::convert<Arg2>(chibi, arg2)
+                ClassRegistratorHelpers<Class>::convert<Arg1>(chibi, arg1),
+                ClassRegistratorHelpers<Class>::convert<Arg2>(chibi, arg2)
             );
 
             return chibi.make_from(res);
@@ -74,7 +74,7 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(
             0, // Flags, no idea what those are
             full_name.c_str(),
             // This is how you do variadic functions in c or something, it will be cast to the appropriate function by scheme
-            reinterpret_cast<sexp_proc1>(CallFunction<Class>::template call<Return, Args...>),
+            reinterpret_cast<sexp_proc1>(ClassRegistratorHelpers<Class>::template call<Return, Args...>),
             // Pass the function ptr as opcode data
             wrapped_memfn_ptr
         )
