@@ -49,7 +49,7 @@ public:
         ClassRegistrator<Class> &register_method(std::string &&name, Return (Class::*member_function)(Args...));
 
         template<typename FieldType>
-        ClassRegistrator<Class> &register_field(std::string &&name, FieldType Class::*field);
+        ClassRegistrator<Class> &register_field(std::string &&name, FieldType Class::*field, bool generate_setter = false);
     private:
         Chibi &chibi;
 

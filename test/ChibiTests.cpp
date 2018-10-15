@@ -107,10 +107,16 @@ TEST(ChibiTests, ClassMembersRegistration) {
         "10 abc"
     );
 
-    registrator.register_field("x", &Testy::x);
+    registrator.register_field("x", &Testy::x, true);
     auto field_getter = chibi.env_ref("testy-x");
+    auto field_setter = chibi.env_ref("set-testy-x!");
     EXPECT_EQ(
         field_getter.apply(testy_ptr_sexp)->to<sexp_sint_t>(),
         21
+    );
+    field_setter.apply(testy_ptr_sexp, chibi.make_integer(23));
+    EXPECT_EQ(
+        field_getter.apply(testy_ptr_sexp)->to<sexp_sint_t>(),
+        23
     );
 }

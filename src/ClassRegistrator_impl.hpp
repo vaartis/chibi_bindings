@@ -15,6 +15,18 @@ namespace { // Implementation detail, so it's in an anon namespace
             return chibi.make_from(this_ptr->**member_ptr);
         }
 
+        template<typename FieldType>
+        static sexp field_set(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp sexp_new_value) {
+            auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+            auto member_ptr = static_cast<FieldType Class::**>(sexp_cpointer_value(sexp_opcode_data(self)));
+
+            Chibi chibi(context);
+
+            this_ptr->**member_ptr = convert<FieldType>(chibi, sexp_new_value);
+
+            return SEXP_UNDEF;
+        }
+
         template<typename Return, typename Arg1>
         static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1) {
             auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
@@ -83,7 +95,7 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(
 
 template<typename Class>
 template<typename FieldType>
-Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(std::string &&name, FieldType Class::*field) {
+Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(std::string &&name, FieldType Class::*field, bool generate_setter) {
     auto field_ptr = new decltype(field)(field);
 
     auto field_freeing_fun = +[](sexp ptr_to_free) {
@@ -96,6 +108,11 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(s
 
     std::string full_name = class_name + "-" + name;
     chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template field_get<FieldType>, wrapped_field_ptr);
+
+    if (generate_setter) {
+        std::string setter_full_name = std::string("set-") + class_name + "-" + name + "!";
+        chibi.register_function(setter_full_name, ClassRegistratorHelpers<Class>::template field_set<FieldType>, wrapped_field_ptr);
+    }
 
     return *this;
 }
