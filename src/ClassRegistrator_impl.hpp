@@ -68,7 +68,7 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(
 
     auto memfn_freeing_fun = +[](sexp ptr_to_free) {
                                   // Free the pointer we've created
-                                  delete static_cast<decltype(member_function) *>(sexp_cpointer_value(ptr_to_free));
+                                  delete static_cast<decltype(memfn_ptr)>(sexp_cpointer_value(ptr_to_free));
                               };
 
     SExp memfn_ptr_type = chibi.make_SExp(sexp_register_c_type(chibi.context, chibi.make_string(typeid(memfn_ptr).name()), memfn_freeing_fun));
