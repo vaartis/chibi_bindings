@@ -3,100 +3,105 @@
 #include "sexp.hpp"
 
 namespace { // Implementation detail, so it's in an anon namespace
-    template<typename Class>
-    struct ClassRegistratorHelpers {
-        template<typename FieldType>
-        static sexp field_get(sexp context, sexp self, long n, sexp this_ptr_sexp) {
-            auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
-            auto member_ptr = static_cast<FieldType Class::**>(sexp_cpointer_value(sexp_opcode_data(self)));
 
-            Chibi chibi(context);
-            return chibi.make_from(this_ptr->**member_ptr);
+template <typename Class>
+struct ClassRegistratorHelpers {
+    template <typename FieldType>
+    static sexp field_get(sexp context, sexp self, long n, sexp this_ptr_sexp) {
+        auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+        auto member_ptr = static_cast<FieldType Class::**>(sexp_cpointer_value(sexp_opcode_data(self)));
+
+        Chibi chibi(context);
+        return chibi.make_from(this_ptr->**member_ptr);
+    }
+
+    template <typename FieldType>
+    static sexp field_set(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp sexp_new_value) {
+        auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+        auto member_ptr = static_cast<FieldType Class::**>(sexp_cpointer_value(sexp_opcode_data(self)));
+
+        Chibi chibi(context);
+        return convert_or_exception(chibi, self, sexp_new_value, this_ptr->**member_ptr);
+    }
+
+    template <typename Return, typename Arg1>
+    static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1_sexp) {
+        auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+        auto fnc_ptr = static_cast<Return (Class::**) (Arg1)>(sexp_cpointer_value(sexp_opcode_data(self))); // Extract the function pointer from opcode data
+
+        Chibi chibi(context);
+
+        Arg1 arg1;
+        if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
+            return set_result;
         }
 
-        template<typename FieldType>
-        static sexp field_set(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp sexp_new_value) {
-            auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
-            auto member_ptr = static_cast<FieldType Class::**>(sexp_cpointer_value(sexp_opcode_data(self)));
+        Return res = (this_ptr->**fnc_ptr)(arg1);
 
-            Chibi chibi(context);
-            return convert_or_exception(chibi, self, sexp_new_value, this_ptr->**member_ptr);
+        return chibi.make_from(res);
+    }
+
+    template <typename Return, typename Arg1, typename Arg2>
+    static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1_sexp, sexp arg2_sexp) {
+        auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+        auto fnc_ptr = static_cast<Return (Class::**) (Arg1, Arg2)>(sexp_cpointer_value(sexp_opcode_data(self)));
+
+        Chibi chibi(context);
+
+        Arg1 arg1;
+        if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
+            return set_result;
+        }
+        Arg2 arg2;
+        if (sexp set_result = convert_or_exception(chibi, self, arg2_sexp, arg2); set_result != SEXP_UNDEF) {
+            return set_result;
         }
 
-        template<typename Return, typename Arg1>
-        static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1_sexp) {
-            auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
-            auto fnc_ptr = static_cast<Return (Class::**) (Arg1)>(sexp_cpointer_value(sexp_opcode_data(self))); // Extract the function pointer from opcode data
+        Return res = (this_ptr->**fnc_ptr)(arg1, arg2);
 
-            Chibi chibi(context);
+        return chibi.make_from(res);
+    }
 
-            Arg1 arg1;
-            if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
-                return set_result;
-            }
+private:
+    /** Convert from sexp to the expected value type and set to to \a set_result_to or return an exception.
+     *
+     * @arg chibi chibi instance to use
+     * @arg self self pointer for error reporting
+     * @arg convert_from the value we're converting from
+     * @arg set_result_to where the result should go on success
+     *
+     * @returns SEXP_UNDEF if everything went ok or a scheme exception if there was an error
+     */
+    template <typename Res>
+    static sexp convert_or_exception(Chibi &chibi, const sexp self, const sexp convert_from, Res &set_result_to) {
+        SExp se = chibi.make_SExp(convert_from);
 
-            Return res = (this_ptr->**fnc_ptr)(arg1);
-
-            return chibi.make_from(res);
+        if (auto r = se.to<Res>(); r.has_value()) {
+            set_result_to = *r;
+        } else {
+            return sexp_xtype_exception(
+                chibi.context,
+                self,
+                (std::string("Expected a value of type ") + typeid(Res).name() + " for convertion").c_str(),
+                convert_from
+            );
         }
 
-        template<typename Return, typename Arg1, typename Arg2>
-        static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1_sexp, sexp arg2_sexp) {
-            auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
-            auto fnc_ptr = static_cast<Return (Class::**) (Arg1, Arg2)>(sexp_cpointer_value(sexp_opcode_data(self)));
+        // Everything is ok, return undef
+        return SEXP_UNDEF;
+    }
+};
 
-            Chibi chibi(context);
-
-            Arg1 arg1;
-            if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
-                return set_result;
-            }
-            Arg2 arg2;
-            if (sexp set_result = convert_or_exception(chibi, self, arg2_sexp, arg2); set_result != SEXP_UNDEF) {
-                return set_result;
-            }
-
-            Return res = (this_ptr->**fnc_ptr)(arg1, arg2);
-
-            return chibi.make_from(res);
-        }
-    private:
-        /** Convert from sexp to the expected value type and set to to \a set_result_to or return an exception.
-         *
-         * @arg chibi chibi instance to use
-         * @arg self self pointer for error reporting
-         * @arg convert_from the value we're converting from
-         * @arg set_result_to where the result should go on success
-         *
-         * @returns SEXP_UNDEF if everything went ok or a scheme exception if there was an error
-         */
-        template<typename Res>
-        static sexp convert_or_exception(Chibi &chibi, sexp self, sexp convert_from, Res &set_result_to) {
-            SExp se = chibi.make_SExp(convert_from);
-
-            if (auto r = se.to<Res>(); r.has_value()) {
-                set_result_to = *r;
-            } else {
-                return sexp_xtype_exception(
-                    chibi.context,
-                    self,
-                    (std::string("Expected a value of type ") + typeid(Res).name() + " for convertion").c_str(),
-                    convert_from
-                );
-            }
-
-            // Everything is ok, return undef
-            return SEXP_UNDEF;
-        }
-    };
 }
 
-template<typename Class>
-Chibi::ClassRegistrator<Class>::ClassRegistrator(Chibi &chibi, std::string &name) : chibi(chibi), class_name(name) { }
+template <typename Class>
+Chibi::ClassRegistrator<Class>::ClassRegistrator(Chibi &chibi, const std::string &name)
+    : chibi(chibi)
+    , class_name(name) { }
 
-template<typename Class>
-template<typename Return, typename... Args>
-Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(std::string &&name, Return (Class::*member_function)(Args...)) {
+template <typename Class>
+template <typename Return, typename... Args>
+Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(const std::string &name, Return (Class::*member_function)(Args...)) {
     auto memfn_ptr = new decltype(member_function)(member_function);
 
     auto memfn_freeing_fun = +[](sexp ptr_to_free) {
@@ -114,9 +119,9 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(
 }
 
 
-template<typename Class>
-template<typename FieldType>
-Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(std::string &&name, FieldType Class::*field, bool generate_setter) {
+template <typename Class>
+template <typename FieldType>
+Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(const std::string &name, FieldType Class::*field, bool generate_setter) {
     auto field_ptr = new decltype(field)(field);
 
     auto field_freeing_fun = +[](sexp ptr_to_free) {

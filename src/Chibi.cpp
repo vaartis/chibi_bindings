@@ -64,7 +64,7 @@ SExp Chibi::make_from(sexp_sint_t from) {
     return make_integer(from);
 }
 
-SExp Chibi::make_from(std::string from) {
+SExp Chibi::make_from(const std::string &from) {
     return make_string(from);
 }
 
@@ -73,7 +73,7 @@ SExp Chibi::make_from(float from) {
 }
 
 template<typename T>
-SExp Chibi::make_from(std::vector<T> &from) {
+SExp Chibi::make_from(const std::vector<T> &from) {
     return make_float(from);
 }
 
