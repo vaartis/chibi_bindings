@@ -7,8 +7,22 @@
 #include "sexp.hpp"
 
 template <typename... Args>
-SExp Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...)) {
-    return make_SExp(sexp_define_foreign(context, env, name.c_str(), sizeof...(Args), fnc));
+SExp Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...), sexp opcode_data) {
+
+    return make_SExp(
+        sexp_define_foreign_aux(
+            context,
+            env,
+            name.c_str(),
+            sizeof...(Args),
+            0, // Flags, no idea what those are
+            name.c_str(),
+            // This is how you do variadic functions in C it seems, it will be cast to the appropriate function by scheme
+            reinterpret_cast<sexp_proc1>(fnc),
+            // Pass the function ptr as opcode data
+            opcode_data
+        )
+    );
 }
 
 template<typename T>

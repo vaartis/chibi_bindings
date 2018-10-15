@@ -65,20 +65,7 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(
     SExp wrapped_memfn_ptr = chibi.make_SExp(sexp_make_cpointer(chibi.context, sexp_type_tag(sexp(memfn_ptr_type)), memfn_ptr, SEXP_FALSE, 1));
 
     std::string full_name = class_name + "-" + name;
-    chibi.make_SExp(
-        sexp_define_foreign_aux(
-            chibi.context,
-            sexp_context_env(chibi.context),
-            full_name.c_str(),
-            sizeof...(Args) + 1, // this pointer + arguments
-            0, // Flags, no idea what those are
-            full_name.c_str(),
-            // This is how you do variadic functions in c or something, it will be cast to the appropriate function by scheme
-            reinterpret_cast<sexp_proc1>(ClassRegistratorHelpers<Class>::template call<Return, Args...>),
-            // Pass the function ptr as opcode data
-            wrapped_memfn_ptr
-        )
-    );
+    chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template call<Return, Args...>, wrapped_memfn_ptr);
 
     return *this;
 }

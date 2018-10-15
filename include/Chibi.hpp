@@ -26,9 +26,10 @@ public:
 
         @arg name name, under which this function will be known in scheme
         @arg fnc the function pointer to use
+        @arg opcode_data optional data associated with the function opcode
      */
     template <typename... Args>
-    SExp register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...));
+    SExp register_function(const std::string &name, sexp (*fnc)(sexp, sexp, long, Args...), sexp opcode_data = nullptr);
 
     /** Class that helps adding C++ class members to scheme. */
     template<typename Class>
