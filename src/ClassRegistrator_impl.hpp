@@ -1,6 +1,9 @@
+#pragma once
+
 #include <string>
 
 #include "sexp.hpp"
+#include "SExpConverters.hpp"
 
 namespace { // Implementation detail, so it's in an anon namespace
 
@@ -12,7 +15,7 @@ struct ClassRegistratorHelpers {
         auto member_ptr = static_cast<FieldType Class::**>(sexp_cpointer_value(sexp_opcode_data(self)));
 
         Chibi chibi(context);
-        return chibi.make_from(this_ptr->**member_ptr);
+        return ToSExp<FieldType>::to(chibi, this_ptr->**member_ptr);
     }
 
     template <typename FieldType>
@@ -38,7 +41,7 @@ struct ClassRegistratorHelpers {
 
         Return res = (this_ptr->**fnc_ptr)(arg1);
 
-        return chibi.make_from(res);
+        return ToSExp<Return>::to(chibi, res);
     }
 
     template <typename Return, typename Arg1, typename Arg2>
@@ -59,7 +62,7 @@ struct ClassRegistratorHelpers {
 
         Return res = (this_ptr->**fnc_ptr)(arg1, arg2);
 
-        return chibi.make_from(res);
+        return ToSExp<Return>::to(chibi, res);
     }
 
 private:
@@ -74,9 +77,7 @@ private:
      */
     template <typename Res>
     static sexp convert_or_exception(Chibi &chibi, const sexp self, const sexp convert_from, Res &set_result_to) {
-        SExp se = chibi.make_SExp(convert_from);
-
-        if (auto r = se.to<Res>(); r.has_value()) {
+        if (auto r = FromSExp<Res>::from(chibi, convert_from); r.has_value()) {
             set_result_to = *r;
         } else {
             return sexp_xtype_exception(

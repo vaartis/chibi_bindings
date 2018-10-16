@@ -84,6 +84,7 @@ if (CHIBI_BINDINGS_BUILD_TESTS)
     test/ChibiTests.cpp
     test/SExpTests.cpp
     test/RTDTests.cpp
+    test/SExpConvertersTests.cpp
     )
   target_link_libraries(chibi_bindings_tests gtest_main chibi_bindings)
   gtest_discover_tests(chibi_bindings_tests)

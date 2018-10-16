@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "Chibi.hpp"
+#include "SExpConverters.hpp"
 
 #include <iostream>
 #include <memory>
@@ -10,7 +11,7 @@ TEST(ChibiTests, EvalString) {
 
     SExp one_sexp = chibi.eval_string("1");
 
-    EXPECT_EQ(one_sexp.to<sexp_sint_t>(), 1);
+    EXPECT_EQ(FromSExp<sexp_sint_t>::from(chibi, one_sexp), 1);
 }
 
 TEST(ChibiTests, CallCFunction) {
@@ -21,8 +22,8 @@ TEST(ChibiTests, CallCFunction) {
     SExp res = chibi.eval_string("(f 10)");
     SExp res2 = ff.apply(chibi.make_integer(11)).value();
 
-    EXPECT_EQ(res.to<sexp_sint_t>(), 10);
-    EXPECT_EQ(res2.to<sexp_sint_t>(), 11);
+    EXPECT_EQ(FromSExp<sexp_sint_t>::from(chibi, res), 10);
+    EXPECT_EQ(FromSExp<sexp_sint_t>::from(chibi, res2), 11);
 }
 
 TEST(ChibiTests, MakeList) {
@@ -41,21 +42,21 @@ TEST(ChibiTests, MakeString) {
     Chibi chibi;
 
     SExp res = chibi.make_string("test");
-    EXPECT_EQ(res.to<std::string>(), "test");
+    EXPECT_EQ(FromSExp<std::string>::from(chibi, res), "test");
 }
 
 TEST(ChibiTests, MakeInteger) {
     Chibi chibi;
 
     SExp res = chibi.make_integer(128);
-    EXPECT_EQ(res.to<sexp_sint_t>(), 128);
+    EXPECT_EQ(FromSExp<sexp_sint_t>::from(chibi, res), 128);
 }
 
 TEST(ChibiTests, MakeFloat) {
     Chibi chibi;
 
     SExp res = chibi.make_float(10.1);
-    EXPECT_FLOAT_EQ(*res.to<float>(), 10.1);
+    EXPECT_FLOAT_EQ(*FromSExp<float>::from(chibi, res), 10.1);
 }
 
 TEST(ChibiTests, EnvRef) {
@@ -82,8 +83,8 @@ TEST(ChibiTests, MakeCPointerAndToPtr) {
     sexp_tag_t objtype2 = sexp_type_tag(sexp_object_type(chibi.context, sexp(s2_ptr)));
 
     EXPECT_EQ(objtype1, objtype2);
-    EXPECT_EQ(p.get(), s_ptr.to_ptr<int>());
-    EXPECT_EQ(p2.get(), s2_ptr.to_ptr<int>());
+    EXPECT_EQ(p.get(), FromSExp<int *>::from(chibi, s_ptr));
+    EXPECT_EQ(p2.get(), FromSExp<int *>::from(chibi, s2_ptr));
 }
 
 TEST(ChibiTests, ClassMembersRegistration) {
@@ -103,7 +104,10 @@ TEST(ChibiTests, ClassMembersRegistration) {
     registrator.register_method("fnc", &Testy::fnc);
     auto fnc_to_call = chibi.env_ref("testy-fnc");
     EXPECT_EQ(
-        fnc_to_call.apply(testy_ptr_sexp, chibi.make_integer(10), chibi.make_string("abc"))->to<std::string>(),
+        FromSExp<std::string>::from(
+            chibi,
+            *fnc_to_call.apply(testy_ptr_sexp, chibi.make_integer(10), chibi.make_string("abc"))
+        ),
         "10 abc"
     );
 
@@ -111,12 +115,12 @@ TEST(ChibiTests, ClassMembersRegistration) {
     auto field_getter = chibi.env_ref("testy-x");
     auto field_setter = chibi.env_ref("set-testy-x!");
     EXPECT_EQ(
-        field_getter.apply(testy_ptr_sexp)->to<sexp_sint_t>(),
+        FromSExp<sexp_sint_t>::from(chibi, *field_getter.apply(testy_ptr_sexp)),
         21
     );
     field_setter.apply(testy_ptr_sexp, chibi.make_integer(23));
     EXPECT_EQ(
-        field_getter.apply(testy_ptr_sexp)->to<sexp_sint_t>(),
+        FromSExp<sexp_sint_t>::from(chibi, *field_getter.apply(testy_ptr_sexp)),
         23
     );
 }

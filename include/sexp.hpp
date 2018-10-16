@@ -45,27 +45,6 @@ public:
     template <typename... Args>
     std::optional<SExp> apply(Args... args) const;
 
-    /** Convert the expression to a value specified.
-     *
-     * If the value is not of this type, nullopt will be returned.
-     */
-    template <typename Output>
-    std::optional<Output> to() const;
-
-    /** Convert the expression from a scheme cpointer to a pointer value specified.
-     *
-     * If the value is not of this type, nullopt will be returned.
-     */
-    template <typename Output>
-    std::optional<Output *> to_ptr() const;
-
-    /** Convert a vector or a list of expressions to an std::vector of specified type.
-     *
-     * If the value is not of this type, nullopt will be returned.
-     */
-    template <typename Output>
-    std::optional<std::vector<Output>> to_vec_of() const;
-
     /** Run the provided function on every element of the underlying list or vector.
      *
      * If the underlying value is neither a list, nor a vector, this function does nothing.

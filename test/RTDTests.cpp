@@ -53,11 +53,17 @@ TEST(RTDTests, GetSetField) {
     RTD rtd(chibi, "b-type");
     SExp b_value = chibi.env_ref("a-b-value");
 
-    EXPECT_EQ(rtd.get_field_from(b_value, "a")->to<sexp_sint_t>().value(), 1);
+    EXPECT_EQ(
+        FromSExp<sexp_sint_t>::from(chibi, *rtd.get_field_from(b_value, "a")),
+        1
+    );
 
     auto sffr = rtd.set_field_for(b_value, "a", chibi.make_integer(3));
     EXPECT_EQ(sffr, RTD::SetFieldResult::Ok);
-    EXPECT_EQ(rtd.get_field_from(b_value, "a")->to<sexp_sint_t>().value(), 3);
+    EXPECT_EQ(
+        FromSExp<sexp_sint_t>::from(chibi, *rtd.get_field_from(b_value, "a")),
+        3
+    );
 
     auto sffr_no_field = rtd.set_field_for(b_value, "c", chibi.make_integer(3));
     EXPECT_EQ(sffr_no_field, RTD::SetFieldResult::NoField);

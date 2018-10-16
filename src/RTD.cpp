@@ -1,12 +1,13 @@
 #include <algorithm>
 
 #include "RTD.hpp"
+#include "SExpConverters.hpp"
 
 RTD::RTD(Chibi &chibi, const std::string &type_name) : chibi(chibi), type_name(type_name) {
     rtd = chibi.env_ref(type_name);
 
     SExp is_type_rtd = is_rtd.apply(rtd).value();
-    if (!is_type_rtd.to<bool>()) {
+    if (!FromSExp<bool>::from(chibi, is_type_rtd).value()) {
         throw std::invalid_argument(type_name + " is not a record type descriptor");
     }
 }
@@ -15,11 +16,11 @@ RTD::RTD(Chibi &chibi, SExp sxp) : chibi(chibi) {
     rtd = sxp;
 
     SExp is_type_rtd = is_rtd.apply(rtd).value();
-    if (!is_type_rtd.to<bool>()) {
+    if (!FromSExp<bool>::from(chibi, is_type_rtd).value()) {
         throw std::invalid_argument("A sexp that is not a record type descriptor was passed to RTD");
     }
 
-    type_name = rtd_name.apply(sxp)->to<Symbol>().value();
+    type_name = FromSExp<Symbol>::from(chibi, rtd_name.apply(sxp).value()).value();
 }
 
 bool RTD::operator==(const RTD &other) {
@@ -28,16 +29,16 @@ bool RTD::operator==(const RTD &other) {
 
 std::vector<Symbol> RTD::fields(bool with_parent) {
     if (with_parent) {
-        return rtd_all_field_names.apply(rtd)->to_vec_of<Symbol>().value();
+        return FromSExp<std::vector<Symbol>>::from(chibi, rtd_all_field_names.apply(rtd).value()).value();
     } else {
-        return rtd_field_names.apply(rtd)->to_vec_of<Symbol>().value();
+        return FromSExp<std::vector<Symbol>>::from(chibi, rtd_field_names.apply(rtd).value()).value();
     }
 }
 
 
 bool RTD::obj_is(SExp obj) {
     auto predicate = rtd_predicate.apply(rtd); // Create the predicate function
-    return predicate->apply(obj)->to<bool>().value();
+    return FromSExp<bool>::from(chibi, predicate->apply(obj).value()).value();
 }
 
 RTD::SetFieldResult RTD::set_field_for(SExp obj, std::string field, SExp value) {

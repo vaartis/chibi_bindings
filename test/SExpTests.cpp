@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
-#include <Chibi.hpp>
+#include "Chibi.hpp"
+#include "SExpConverters.hpp"
 
 TEST(SExpTests, DumpToPort) {
     Chibi chibi;
@@ -10,12 +11,18 @@ TEST(SExpTests, DumpToPort) {
     SExp exp = chibi.eval_string("(error \"an error\")");
     exp.dump_to_port(outputPort);
 
-    EXPECT_EQ(chibi.make_SExp(sexp_get_output_string(chibi.context, outputPort)).to<std::string>(), "ERROR: an error\n");
+    EXPECT_EQ(
+        FromSExp<std::string>::from(chibi, sexp_get_output_string(chibi.context, outputPort)),
+        "ERROR: an error\n"
+    );
 
     SExp outputPort2 = chibi.make_SExp(sexp_open_output_string(chibi.context));
     SExp exp2 = chibi.eval_string("1");
     exp2.dump_to_port(outputPort2);
-    EXPECT_EQ(chibi.make_SExp(sexp_get_output_string(chibi.context, outputPort2)).to<std::string>(), "1\n");
+    EXPECT_EQ(
+        FromSExp<std::string>::from(chibi, sexp_get_output_string(chibi.context, outputPort2)),
+        "1\n"
+    );
 }
 
 TEST(SExpTests, DumpToString) {
@@ -30,36 +37,6 @@ TEST(SExpTests, DumpToString) {
     EXPECT_EQ(exp2.dump_to_string(), "1\n");
 }
 
-TEST(SExpTests, To) {
-    Chibi chibi;
-
-    std::string str = "1";
-    SExp lst = chibi.eval_string(str);
-    EXPECT_EQ(lst.to<sexp_sint_t>(), 1);
-
-    str = "#t";
-    SExp lst2 = chibi.eval_string(str);
-    EXPECT_EQ(lst2.to<bool>(), true);
-
-    str = "\"abc\"";
-    SExp lst3 = chibi.eval_string(str);
-    EXPECT_EQ(lst3.to<std::string>(), "abc");
-}
-
-TEST(SExpTests, ToVecOf) {
-    Chibi chibi;
-
-    std::string str = "#(1 2 3)";
-    std::string str_l = "'(1 2 3)";
-    std::vector<sexp_sint_t> r {1, 2, 3};
-
-    SExp vc = chibi.eval_string(str);
-    SExp ls = chibi.eval_string(str_l);
-
-    EXPECT_EQ(vc.to_vec_of<sexp_sint_t>().value(), r);
-    EXPECT_EQ(ls.to_vec_of<sexp_sint_t>().value(), r);
-}
-
 TEST(SExpTests, ForEach) {
     Chibi chibi;
 
@@ -70,14 +47,14 @@ TEST(SExpTests, ForEach) {
     SExp vc = chibi.eval_string(str);
     SExp ls = chibi.eval_string(str_l);
 
-    vc.for_each([&x1](auto exp) {
-                    x1 += exp.template to<sexp_sint_t>().value();
+    vc.for_each([&x1, &chibi](auto exp) {
+                    x1 += *FromSExp<sexp_sint_t>::from(chibi, exp);
                 }
     );
 
-    ls.for_each([&x2](auto exp) {
-                    x2 += exp.template to<sexp_sint_t>().value();
-                  }
+    ls.for_each([&x2, &chibi](auto exp) {
+                    x2 += *FromSExp<sexp_sint_t>::from(chibi, exp);
+                }
     );
 
     EXPECT_EQ(x1, x2);
@@ -89,7 +66,7 @@ TEST(SExpTests, Apply) {
     Chibi chibi;
 
     EXPECT_TRUE(
-        chibi.env_ref("string?").apply(chibi.eval_string("\"a\""))->to<bool>()
+        FromSExp<bool>::from(chibi, *chibi.env_ref("string?").apply(chibi.eval_string("\"a\"")))
     );
 
     EXPECT_EQ(
