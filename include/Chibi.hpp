@@ -97,6 +97,9 @@ public:
     /** Creates a scheme string from a C++ string. Unlike sexp_make_string, this function fills the string with actual content. */
     SExp make_string(const std::string &str);
 
+    /** Creates a scheme boolean. */
+    SExp make_bool(bool b);
+
     /** Create a scheme float. */
     SExp make_float(float num);
 

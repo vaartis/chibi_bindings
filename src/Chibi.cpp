@@ -56,6 +56,10 @@ SExp Chibi::make_integer(sexp_sint_t num) {
     return make_SExp(sexp_make_integer(context, num));
 }
 
+SExp Chibi::make_bool(bool b) {
+    return make_SExp(sexp_make_boolean(b));
+}
+
 SExp Chibi::make_SExp(const sexp &exp) {
     return SExp(*this, exp);
 }
