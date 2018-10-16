@@ -85,3 +85,38 @@ TEST(ChibiTests, MakeCPointerAndToPtr) {
     EXPECT_EQ(p.get(), s_ptr.to_ptr<int>());
     EXPECT_EQ(p2.get(), s2_ptr.to_ptr<int>());
 }
+
+TEST(ChibiTests, ClassMembersRegistration) {
+    Chibi chibi;
+
+    struct Testy {
+        std::string fnc(sexp_sint_t x, std::string y) { return std::to_string(x) + " " + y; }
+
+        sexp_sint_t x = 21;
+    };
+
+    auto testy_ptr = std::make_shared<Testy>();
+    auto testy_ptr_sexp = chibi.make_cpointer(testy_ptr.get());
+
+    auto registrator = chibi.register_class<Testy>("testy");
+
+    registrator.register_method("fnc", &Testy::fnc);
+    auto fnc_to_call = chibi.env_ref("testy-fnc");
+    EXPECT_EQ(
+        fnc_to_call.apply(testy_ptr_sexp, chibi.make_integer(10), chibi.make_string("abc"))->to<std::string>(),
+        "10 abc"
+    );
+
+    registrator.register_field("x", &Testy::x, true);
+    auto field_getter = chibi.env_ref("testy-x");
+    auto field_setter = chibi.env_ref("set-testy-x!");
+    EXPECT_EQ(
+        field_getter.apply(testy_ptr_sexp)->to<sexp_sint_t>(),
+        21
+    );
+    field_setter.apply(testy_ptr_sexp, chibi.make_integer(23));
+    EXPECT_EQ(
+        field_getter.apply(testy_ptr_sexp)->to<sexp_sint_t>(),
+        23
+    );
+}
