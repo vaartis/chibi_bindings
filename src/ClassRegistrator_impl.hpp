@@ -9,6 +9,9 @@ namespace { // Implementation detail, so it's in an anon namespace
 
 template <typename Class>
 struct ClassRegistratorHelpers {
+
+    // Field helpers
+
     template <typename FieldType>
     static sexp field_get(sexp context, sexp self, long n, sexp this_ptr_sexp) {
         auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
@@ -25,6 +28,20 @@ struct ClassRegistratorHelpers {
 
         Chibi chibi(context);
         return convert_or_exception(chibi, self, sexp_new_value, this_ptr->**member_ptr);
+    }
+
+    // Call helpers
+
+    template <typename Return>
+    static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp) {
+        auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+        auto fnc_ptr = static_cast<Return (Class::**)>(sexp_cpointer_value(sexp_opcode_data(self))); // Extract the function pointer from opcode data
+
+        Chibi chibi(context);
+
+        Return res = (this_ptr->**fnc_ptr)();
+
+        return ToSExp<Return>::to(chibi, res);
     }
 
     template <typename Return, typename Arg1>
@@ -63,6 +80,70 @@ struct ClassRegistratorHelpers {
         Return res = (this_ptr->**fnc_ptr)(arg1, arg2);
 
         return ToSExp<Return>::to(chibi, res);
+    }
+
+    // Constructor helpers
+
+    static sexp construct(sexp context, sexp self, long n) {
+        Chibi chibi(context);
+
+        Class *constructed_class = new Class();
+
+        auto class_freeing_fun = +[](sexp  ctx, sexp self, long n, sexp ptr_to_free) {
+                                      // Free the pointer we've created
+                                      delete static_cast<Class *>(sexp_cpointer_value(ptr_to_free));
+
+                                      return SEXP_UNDEF;
+                                  };
+
+        return chibi.make_cpointer(constructed_class, class_freeing_fun);
+    }
+
+    template<typename Arg1>
+    static sexp construct(sexp context, sexp self, long n, sexp arg1_sexp) {
+        Chibi chibi(context);
+
+        Arg1 arg1;
+        if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
+            return set_result;
+        }
+
+        Class *constructed_class = new Class(arg1);
+
+        auto class_freeing_fun = +[](sexp  ctx, sexp self, long n, sexp ptr_to_free) {
+                                      // Free the pointer we've created
+                                      delete static_cast<Class *>(sexp_cpointer_value(ptr_to_free));
+
+                                      return SEXP_UNDEF;
+                                  };
+
+        return chibi.make_cpointer(constructed_class, class_freeing_fun);
+    }
+
+    template<typename Arg1, typename Arg2>
+    static sexp construct(sexp context, sexp self, long n, sexp arg1_sexp, sexp arg2_sexp) {
+        Chibi chibi(context);
+
+        Arg1 arg1;
+        if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
+            return set_result;
+        }
+
+        Arg1 arg2;
+        if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
+            return set_result;
+        }
+
+        Class *constructed_class = new Class(arg1, arg2);
+
+        auto class_freeing_fun = +[](sexp  ctx, sexp self, long n, sexp ptr_to_free) {
+                                      // Free the pointer we've created
+                                      delete static_cast<Class *>(sexp_cpointer_value(ptr_to_free));
+
+                                      return SEXP_UNDEF;
+                                  };
+
+        return chibi.make_cpointer(constructed_class, class_freeing_fun);
     }
 
 private:
@@ -144,6 +225,25 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(c
         std::string setter_full_name = std::string("set-") + class_name + "-" + name + "!";
         chibi.register_function(setter_full_name, ClassRegistratorHelpers<Class>::template field_set<FieldType>, wrapped_field_ptr);
     }
+
+    return *this;
+}
+
+template <typename Class>
+Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_default_constructor(std::string postfix) {
+    std::string full_name = std::string("make-") + class_name + (postfix.empty() ? "" : "-" + postfix);
+
+    chibi.register_function(full_name, &ClassRegistratorHelpers<Class>::construct);
+
+    return *this;
+}
+
+template <typename Class>
+template <typename... Args>
+Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_constructor(std::string postfix) {
+    std::string full_name = std::string("make-") + class_name + (postfix.empty() ? "" : "-" + postfix);
+
+    chibi.register_function(full_name, &ClassRegistratorHelpers<Class>::template construct<Args...>);
 
     return *this;
 }

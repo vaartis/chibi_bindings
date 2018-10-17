@@ -59,6 +59,11 @@ public:
         template <typename FieldType>
         ClassRegistrator<Class> &register_field(const std::string &name, FieldType Class::*field, bool generate_setter = false);
 
+        Chibi::ClassRegistrator<Class> &register_default_constructor(std::string postfix = "");
+
+        template <typename... Args>
+        Chibi::ClassRegistrator<Class> &register_constructor(std::string postfix = "");
+
     private:
         Chibi &chibi;
 
