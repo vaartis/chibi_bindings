@@ -82,9 +82,13 @@ public:
 
         The pointer will not be freed by scheme, which means you will need to free it yourself.
         The scheme name of the type will be the one returnred by typeid (which varies between compilers).
+
+        @arg ptr the pointer to use
+        @arg freeing_callback when the reference count reaches zero or the context is destroyed, this function will be called
+                              like a normal scheme function with it's first non-utility argument being the cpointer to free
      */
     template <typename T>
-    SExp make_cpointer(T *ptr);
+    SExp make_cpointer(T *ptr, sexp_proc2 freeing_callback = nullptr);
 
     /** Make, or "intern", a symbol from a given string.  */
     SExp make_symbol(const std::string &symbol);

@@ -105,13 +105,14 @@ template <typename Return, typename... Args>
 Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(const std::string &name, Return (Class::*member_function)(Args...)) {
     auto memfn_ptr = new decltype(member_function)(member_function);
 
-    auto memfn_freeing_fun = +[](sexp ptr_to_free) {
+    auto memfn_freeing_fun = +[](sexp ctx, sexp self, long n, sexp ptr_to_free) {
                                   // Free the pointer we've created
                                   delete static_cast<decltype(memfn_ptr)>(sexp_cpointer_value(ptr_to_free));
+
+                                  return SEXP_UNDEF;
                               };
 
-    SExp memfn_ptr_type = chibi.make_SExp(sexp_register_c_type(chibi.context, chibi.make_string(typeid(memfn_ptr).name()), memfn_freeing_fun));
-    SExp wrapped_memfn_ptr = chibi.make_SExp(sexp_make_cpointer(chibi.context, sexp_type_tag(sexp(memfn_ptr_type)), memfn_ptr, SEXP_FALSE, 1));
+    SExp wrapped_memfn_ptr = chibi.make_cpointer(memfn_ptr, memfn_freeing_fun);
 
     std::string full_name = class_name + "-" + name;
     chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template call<Return, Args...>, wrapped_memfn_ptr);
@@ -125,17 +126,20 @@ template <typename FieldType>
 Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_field(const std::string &name, FieldType Class::*field, bool generate_setter) {
     auto field_ptr = new decltype(field)(field);
 
-    auto field_freeing_fun = +[](sexp ptr_to_free) {
+    auto field_freeing_fun = +[](sexp ctx, sexp self, long n, sexp ptr_to_free) {
                                   // Free the pointer we've created
                                   delete static_cast<decltype(field_ptr)>(sexp_cpointer_value(ptr_to_free));
+
+                                  return SEXP_UNDEF;
                               };
+    // Create the field cpointer
+    SExp wrapped_field_ptr = chibi.make_cpointer(field_ptr, field_freeing_fun);
 
-    SExp field_ptr_type = chibi.make_SExp(sexp_register_c_type(chibi.context, chibi.make_string(typeid(field_ptr).name()), field_freeing_fun));
-    SExp wrapped_field_ptr = chibi.make_SExp(sexp_make_cpointer(chibi.context, sexp_type_tag(sexp(field_ptr_type)), field_ptr, SEXP_FALSE, 1));
-
+    // Register the function to access it
     std::string full_name = class_name + "-" + name;
     chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template field_get<FieldType>, wrapped_field_ptr);
 
+    // Optionally generate a setter for the field
     if (generate_setter) {
         std::string setter_full_name = std::string("set-") + class_name + "-" + name + "!";
         chibi.register_function(setter_full_name, ClassRegistratorHelpers<Class>::template field_set<FieldType>, wrapped_field_ptr);

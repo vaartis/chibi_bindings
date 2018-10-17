@@ -26,19 +26,19 @@ SExp Chibi::register_function(const std::string &name, sexp (*fnc)(sexp, sexp, l
 }
 
 template<typename T>
-SExp Chibi::make_cpointer(T *ptr) {
+SExp Chibi::make_cpointer(T *ptr, sexp_proc2 freeing_callback) {
     auto type_name = std::string("--cpointer-type-") + typeid(T).name(); // Make a type name that will be unique for every type
 
     SExp sexp_type = env_ref(type_name);
     if (sexp_type == SEXP_FALSE) {
-        sexp_type = make_SExp(sexp_register_c_type(context, make_string(type_name), nullptr));
+        sexp_type = make_SExp(sexp_register_c_type(context, make_string(type_name), freeing_callback));
 
         // Save the type for future use
         sexp_env_define(context, env, make_symbol(type_name), sexp_type);
     }
 
     return make_SExp(
-        sexp_make_cpointer(context, sexp_type_tag(sexp(sexp_type)), ptr, SEXP_FALSE, 0)
+        sexp_make_cpointer(context, sexp_type_tag(sexp(sexp_type)), ptr, SEXP_FALSE, freeing_callback != nullptr) // Use the finalizer if there is one
     );
 }
 
