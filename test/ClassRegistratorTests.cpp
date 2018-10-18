@@ -11,7 +11,8 @@ struct Testy {
 
     // Field
     sexp_sint_t x;
-    void set_x(sexp_sint_t x) { this->x = x; }
+    sexp_sint_t y = 0;
+    void set_xy(sexp_sint_t x, sexp_sint_t y) { this->x = x; this->y = y; }
 };
 
 struct ClassRegistratorTests : public testing::Test {
@@ -38,12 +39,16 @@ TEST_F(ClassRegistratorTests, NoReturnMethod) {
     auto testy_ptr = std::make_shared<Testy>();
     auto testy_ptr_sexp = chibi.make_cpointer(testy_ptr.get());
 
-    registrator.register_noreturn_method("set-x", &Testy::set_x);
-    auto fnc_to_call = chibi.env_ref("testy-set-x");
-    fnc_to_call.apply(testy_ptr_sexp, chibi.make_integer(24));
+    registrator.register_noreturn_method("set-xy", &Testy::set_xy);
+    auto fnc_to_call = chibi.env_ref("testy-set-xy");
+    fnc_to_call.apply(testy_ptr_sexp, chibi.make_integer(24), chibi.make_integer(212));
     EXPECT_EQ(
         testy_ptr->x,
         24
+    );
+    EXPECT_EQ(
+        testy_ptr->y,
+        212
     );
 }
 

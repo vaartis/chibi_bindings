@@ -65,6 +65,8 @@ struct ClassRegistratorHelpers {
             return set_result;
         }
 
+        (this_ptr->**fnc_ptr)(arg1, arg2);
+
         return SEXP_UNDEF;
     }
 
