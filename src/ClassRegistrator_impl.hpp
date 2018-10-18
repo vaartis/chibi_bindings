@@ -255,7 +255,7 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_noretur
     SExp wrapped_memfn_ptr = chibi.make_cpointer(memfn_ptr, memfn_freeing_fun);
 
     std::string full_name = class_name + "-" + name;
-    chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template noreturn_call<Args...>, wrapped_memfn_ptr);
+    chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template call_noreturn<Args...>, wrapped_memfn_ptr);
 
     return *this;
 }
