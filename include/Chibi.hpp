@@ -64,8 +64,16 @@ public:
         template <typename FieldType>
         ClassRegistrator<Class> &register_field(const std::string &name, FieldType Class::*field, bool generate_setter = false);
 
+        /** Register the default (no argument) constructor as make-<class-name>-<postfix>.
+         *
+         * @args postfix postfix to append to the constructor's name in scheme
+         */
         Chibi::ClassRegistrator<Class> &register_default_constructor(std::string postfix = "");
 
+        /** Register the class constructor with specified argument types as make-<class-name>-<postfix>.
+         *
+         * @args postfix postfix to append to the constructor's name in scheme
+         */
         template <typename... Args>
         Chibi::ClassRegistrator<Class> &register_constructor(std::string postfix = "");
 
