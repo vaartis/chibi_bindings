@@ -39,7 +39,7 @@ struct ClassRegistratorHelpers {
 
         Chibi chibi(context);
 
-        Arg1 arg1;
+        std::decay_t<Arg1> arg1;
         if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
             return set_result;
         }
@@ -56,11 +56,11 @@ struct ClassRegistratorHelpers {
 
         Chibi chibi(context);
 
-        Arg1 arg1;
+        std::decay_t<Arg1> arg1;
         if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
             return set_result;
         }
-        Arg2 arg2;
+        std::decay_t<Arg2> arg2;
         if (sexp set_result = convert_or_exception(chibi, self, arg2_sexp, arg2); set_result != SEXP_UNDEF) {
             return set_result;
         }
@@ -89,7 +89,7 @@ struct ClassRegistratorHelpers {
 
         Chibi chibi(context);
 
-        Arg1 arg1;
+        std::decay_t<Arg1> arg1;
         if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
             return set_result;
         }
@@ -106,11 +106,12 @@ struct ClassRegistratorHelpers {
 
         Chibi chibi(context);
 
-        Arg1 arg1;
+        std::decay_t<Arg1> arg1;
         if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
             return set_result;
         }
-        Arg2 arg2;
+
+        std::decay_t<Arg2> arg2;
         if (sexp set_result = convert_or_exception(chibi, self, arg2_sexp, arg2); set_result != SEXP_UNDEF) {
             return set_result;
         }
@@ -141,7 +142,7 @@ struct ClassRegistratorHelpers {
     static sexp construct(sexp context, sexp self, long n, sexp arg1_sexp) {
         Chibi chibi(context);
 
-        Arg1 arg1;
+        std::decay_t<Arg1> arg1;
         if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
             return set_result;
         }
@@ -162,12 +163,12 @@ struct ClassRegistratorHelpers {
     static sexp construct(sexp context, sexp self, long n, sexp arg1_sexp, sexp arg2_sexp) {
         Chibi chibi(context);
 
-        Arg1 arg1;
+        std::decay_t<Arg1> arg1;
         if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
             return set_result;
         }
 
-        Arg1 arg2;
+        std::decay_t<Arg2> arg2;
         if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
             return set_result;
         }
