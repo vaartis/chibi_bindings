@@ -30,12 +30,50 @@ struct ClassRegistratorHelpers {
         return convert_or_exception(chibi, self, sexp_new_value, this_ptr->**member_ptr);
     }
 
+    // Void call helpers
+
+    template <typename Arg1>
+    static sexp call_noreturn(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1_sexp) {
+        auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+        auto fnc_ptr = static_cast<void (Class::**) (Arg1)>(sexp_cpointer_value(sexp_opcode_data(self)));
+
+        Chibi chibi(context);
+
+        Arg1 arg1;
+        if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
+            return set_result;
+        }
+
+        (this_ptr->**fnc_ptr)(arg1);
+
+        return SEXP_UNDEF;
+    }
+
+    template <typename Arg1, typename Arg2>
+    static sexp call_noreturn(sexp context, sexp self, long n, sexp this_ptr_sexp, sexp arg1_sexp, sexp arg2_sexp) {
+        auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
+        auto fnc_ptr = static_cast<void (Class::**) (Arg1, Arg2)>(sexp_cpointer_value(sexp_opcode_data(self)));
+
+        Chibi chibi(context);
+
+        Arg1 arg1;
+        if (sexp set_result = convert_or_exception(chibi, self, arg1_sexp, arg1); set_result != SEXP_UNDEF) {
+            return set_result;
+        }
+        Arg2 arg2;
+        if (sexp set_result = convert_or_exception(chibi, self, arg2_sexp, arg2); set_result != SEXP_UNDEF) {
+            return set_result;
+        }
+
+        return SEXP_UNDEF;
+    }
+
     // Call helpers
 
     template <typename Return>
     static sexp call(sexp context, sexp self, long n, sexp this_ptr_sexp) {
         auto this_ptr = static_cast<Class *>(sexp_cpointer_value(this_ptr_sexp));
-        auto fnc_ptr = static_cast<Return (Class::**)>(sexp_cpointer_value(sexp_opcode_data(self))); // Extract the function pointer from opcode data
+        auto fnc_ptr = static_cast<Return (Class::**)>(sexp_cpointer_value(sexp_opcode_data(self)));
 
         Chibi chibi(context);
 
@@ -197,6 +235,26 @@ Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_method(
 
     std::string full_name = class_name + "-" + name;
     chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template call<Return, Args...>, wrapped_memfn_ptr);
+
+    return *this;
+}
+
+template <typename Class>
+template <typename... Args>
+Chibi::ClassRegistrator<Class> &Chibi::ClassRegistrator<Class>::register_noreturn_method(const std::string &name, void (Class::*member_function)(Args...)) {
+    auto memfn_ptr = new decltype(member_function)(member_function);
+
+    auto memfn_freeing_fun = +[](sexp ctx, sexp self, long n, sexp ptr_to_free) {
+                                  // Free the pointer we've created
+                                  delete static_cast<decltype(memfn_ptr)>(sexp_cpointer_value(ptr_to_free));
+
+                                  return SEXP_UNDEF;
+                              };
+
+    SExp wrapped_memfn_ptr = chibi.make_cpointer(memfn_ptr, memfn_freeing_fun);
+
+    std::string full_name = class_name + "-" + name;
+    chibi.register_function(full_name, ClassRegistratorHelpers<Class>::template noreturn_call<Args...>, wrapped_memfn_ptr);
 
     return *this;
 }

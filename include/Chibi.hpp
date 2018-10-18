@@ -49,6 +49,11 @@ public:
         template <typename Return, typename... Args>
         ClassRegistrator<Class> &register_method(const std::string &name, Return (Class::*member_function)(Args...));
 
+        template <typename... Args>
+        /** Same as #register_method except for methods returning void. */
+        ClassRegistrator<Class> &register_noreturn_method(const std::string &name, void (Class::*member_function)(Args...));
+
+
         /** Register a class field to be accessible from scheme under the name "<class-name>-<field-name>".
          *  Optionally, add a setter named "set-<class-name>-<field-name>!".
          *
